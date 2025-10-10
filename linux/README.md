@@ -30,28 +30,87 @@ sudo pacman -S base-devel linux-headers alsa-utils alsa-lib
 
 ## Building
 
+### Using CMake (Recommended)
+
+```bash
+cd /path/to/virtual-sound-card
+mkdir build && cd build
+cmake ..
+cmake --build .
+```
+
+The Linux programs will be built in `build/linux/`:
+- `sine_generator_app` - Sine wave generator
+- `test_loopback_read` - Audio verification test
+
+### Using Makefile
+
 ```bash
 cd linux
 make
 ```
 
+Programs will be built in `linux/build/`:
+- `sine_generator_app` - Sine wave generator
+- `test_loopback_read` - Audio verification test
+
 ## Installation
 
 ```bash
+cd linux
 sudo make install
 ```
+
+This installs programs to `/usr/local/bin/`.
 
 ## Usage
 
 ### Loading the Module
 
-```bash
-# Load with default configuration (2 input, 2 output channels)
-sudo modprobe snd-vcard
+The Linux implementation uses the ALSA loopback module (`snd-aloop`) which provides a virtual sound card.
 
-# Load with custom configuration
-sudo modprobe snd-vcard channels_in=4 channels_out=4
+```bash
+# Load the ALSA loopback module
+sudo modprobe snd-aloop
+
+# Verify it loaded successfully
+aplay -l | grep Loopback
 ```
+
+The module creates a loopback device with two subdevices:
+- `hw:Loopback,0,0` - Playback subdevice (write audio here)
+- `hw:Loopback,1,0` - Capture subdevice (read audio here)
+
+### Running the Sine Wave Generator
+
+```bash
+# Generate a 440Hz sine wave for 5 seconds (default)
+./build/sine_generator_app
+
+# Generate a 880Hz sine wave for 10 seconds
+./build/sine_generator_app 880 10
+
+# Or if installed:
+sine_generator_app 880 10
+```
+
+### Testing the Loopback
+
+In one terminal, run the sine wave generator:
+```bash
+./build/sine_generator_app 440 10
+```
+
+In another terminal, run the test to verify:
+```bash
+./build/test_loopback_read
+```
+
+The test will:
+1. Read audio from the loopback device
+2. Analyze the signal amplitude
+3. Detect the frequency using zero-crossing detection
+4. Verify it matches the expected 440Hz tone
 
 ### Verifying Installation
 
@@ -65,23 +124,59 @@ aplay -D hw:VirtualCard test.wav
 
 ## Configuration
 
+### ALSA Loopback Module Parameters
+
+The `snd-aloop` module can be loaded with custom parameters:
+
+```bash
+# Load with custom configuration
+sudo modprobe snd-aloop pcm_substreams=2 index=1
+
+# Remove and reload with different settings
+sudo modprobe -r snd-aloop
+sudo modprobe snd-aloop pcm_substreams=4
+```
+
 Module parameters:
-- `channels_in`: Number of input channels (default: 2, max: 32)
-- `channels_out`: Number of output channels (default: 2, max: 32)
-- `sample_rate`: Sample rate in Hz (default: 48000)
-- `buffer_size`: Buffer size in frames (default: 1024)
+- `index`: Sound card index (default: -1, auto-assign)
+- `id`: Sound card ID string (default: "Loopback")
+- `pcm_substreams`: Number of subdevice pairs (default: 8, max: 8)
+- `pcm_notify`: Notification for PCM (default: 0)
+
+### Application Configuration
+
+The sine wave generator uses:
+- Sample rate: 48000 Hz
+- Channels: 2 (stereo)
+- Format: S16_LE (16-bit signed little-endian)
+- Buffer size: 1024 frames
 
 ## Development
+
+### Implementation Details
+
+This implementation uses the ALSA loopback module (`snd-aloop`) instead of a custom kernel driver. This approach:
+- Uses existing, well-tested kernel functionality
+- Requires no custom kernel module compilation
+- Provides full ALSA device capabilities
+- Works across different kernel versions
+
+The loopback device creates virtual audio cables where:
+- Audio written to one subdevice can be read from its paired subdevice
+- Multiple applications can use the device simultaneously
+- Supports standard ALSA configuration and routing
 
 ### File Structure
 
 ```
 linux/
-├── kernel/         # Kernel module source
-├── userspace/      # User-space utilities
-├── tests/          # Test scripts and programs
-├── Makefile        # Build configuration
-└── README.md       # This file
+├── userspace/          # User-space utilities
+│   └── sine_generator_app.c   # Sine wave generator
+├── tests/              # Test programs
+│   └── test_loopback_read.c   # Loopback verification test
+├── Makefile            # Build configuration
+├── CMakeLists.txt      # CMake build configuration
+└── README.md           # This file
 ```
 
 ### Debugging
@@ -94,17 +189,50 @@ dmesg -w | grep vcard
 
 ## Testing
 
-```bash
-# Run test suite
-make test
+### Automated Test
 
-# Manual testing with aplay/arecord
-arecord -D hw:VirtualCard -f cd | aplay -D hw:VirtualCard -f cd
+```bash
+cd linux
+make setup    # Load snd-aloop module
+make test     # Run automated test suite
+```
+
+The automated test:
+1. Starts the sine wave generator in the background
+2. Runs the loopback read test
+3. Verifies frequency and amplitude
+4. Reports pass/fail
+
+### Manual Testing
+
+Terminal 1 - Generate sine wave:
+```bash
+./build/sine_generator_app 440 10
+```
+
+Terminal 2 - Verify audio:
+```bash
+./build/test_loopback_read
+```
+
+### Testing with ALSA Tools
+
+```bash
+# Record from loopback and play to default output
+arecord -D hw:Loopback,1,0 -f cd | aplay
+
+# Generate test tone with speaker-test
+speaker-test -D hw:Loopback,0,0 -c 2 -t sine
+
+# In another terminal, record it
+arecord -D hw:Loopback,1,0 -f cd -d 5 test.wav
 ```
 
 ## Known Issues
 
-- None yet (project in development)
+- The `snd-aloop` module may not be available in some minimal kernel configurations
+- On some systems, you may need to install `linux-modules-extra-$(uname -r)` package
+- Audio latency depends on buffer size and system load
 
 ## References
 
