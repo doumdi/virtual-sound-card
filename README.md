@@ -74,14 +74,39 @@ The macOS implementation uses CoreAudio framework for creating virtual audio dev
 
 ### Building
 
-Detailed build instructions for each platform can be found in the respective platform directories:
+The project uses **CMake** as the cross-platform build system. For detailed installation instructions, see [INSTALL.md](INSTALL.md).
 
-- [Linux Build Instructions](linux/README.md)
-- [Windows Build Instructions](windows/README.md)
-- [macOS Build Instructions](macos/README.md)
+**Quick Start:**
 
-## Features (Planned)
+```bash
+# Clone the repository
+git clone https://github.com/doumdi/virtual-sound-card.git
+cd virtual-sound-card
 
+# Build
+mkdir build && cd build
+cmake ..
+cmake --build .
+
+# Run tests
+ctest --output-on-failure
+```
+
+Platform-specific implementation details:
+
+- [Linux Implementation](linux/README.md)
+- [Windows Implementation](windows/README.md)
+- [macOS Implementation](macos/README.md)
+
+## Features
+
+### Implemented
+- [x] **CMake Build System**: Cross-platform build configuration
+- [x] **Sine Wave Generator**: Test audio generation for verification
+- [x] **Test Suite**: Automated testing with CTest
+- [x] **Common API**: Cross-platform API definitions
+
+### Planned
 - [ ] Configurable number of input channels (1-32)
 - [ ] Configurable number of output channels (1-32)
 - [ ] Sample rate support: 44.1kHz, 48kHz, 96kHz, 192kHz
