@@ -1,0 +1,112 @@
+# Build artifacts
+build/
+dist/
+*.o
+*.obj
+*.ko
+*.so
+*.dll
+*.dylib
+*.a
+*.lib
+*.exe
+*.app
+*.dext
+*.kext
+
+# Compiled kernel modules
+*.mod.c
+*.mod
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+*.vcxproj.user
+Debug/
+Release/
+x64/
+ARM64/
+ipch/
+*.ipch
+
+# Xcode
+xcuserdata/
+*.xcworkspace/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.pbxuser
+!default.pbxuser
+!default.mode1v3
+!default.mode2v3
+!default.perspectivev3
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+*.swp
+*.swo
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+.project
+.cproject
+.settings/
+
+# Dependencies
+node_modules/
+bower_components/
+
+# Test outputs
+*.log
+*.tlog
+test_results/
+coverage/
+
+# Package managers
+*.egg-info/
+__pycache__/
+*.pyc
+
+# Certificates and keys (security)
+*.pfx
+*.p12
+*.key
+*.pem
+*.crt
+*.cer
+!test*.pem
+!test*.crt
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+
+# Documentation builds
+docs/_build/
+docs/html/
+docs/latex/
