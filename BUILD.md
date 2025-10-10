@@ -42,6 +42,12 @@ The build produces:
 - `tests/test_api_init` - API initialization tests
 - `tests/test_sine_wave_file` - WAV file generation test
 
+### Linux-Specific Output
+
+When building on Linux with ALSA support:
+- `linux/sine_generator_app` - Sine wave generator application
+- `linux/test_loopback_read` - Loopback device verification test
+
 ## Installation
 
 ```bash

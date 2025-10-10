@@ -93,6 +93,20 @@ Available options:
 
 ### Linux
 
+#### Prerequisites
+
+```bash
+# Ubuntu/Debian - Install ALSA development libraries
+sudo apt-get update
+sudo apt-get install build-essential cmake git libasound2-dev alsa-utils
+
+# Fedora/RHEL
+sudo dnf install cmake gcc gcc-c++ git alsa-lib-devel alsa-utils
+
+# Arch Linux
+sudo pacman -S base-devel cmake git alsa-lib alsa-utils
+```
+
 #### Building
 
 ```bash
@@ -102,23 +116,39 @@ cmake -DBUILD_LINUX=ON ..
 cmake --build .
 ```
 
+The Linux build creates:
+- `libvcard_common.a` - Common library
+- `sine_generator_app` - Sine wave generator for testing
+- `test_loopback_read` - Audio verification test
+
 #### Installation
 
 ```bash
 # Install libraries and headers
 sudo cmake --install .
 
-# Install to custom prefix
-cmake --install . --prefix /usr/local
+# Install Linux userspace programs
+cd ../linux
+sudo make install
 ```
 
-#### Verification
+#### Setup and Verification
 
 ```bash
-# List installed files
-ls /usr/local/lib/libvcard*
-ls /usr/local/include/vcard.h
+# Load the ALSA loopback kernel module
+sudo modprobe snd-aloop
+
+# Verify loopback devices are available
+aplay -l | grep Loopback
+
+# Test the sine wave generator
+sine_generator_app 440 5
+
+# In another terminal, verify the audio
+test_loopback_read
 ```
+
+For detailed Linux usage, see [linux/README.md](linux/README.md).
 
 ### Windows
 
