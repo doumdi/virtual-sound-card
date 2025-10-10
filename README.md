@@ -74,7 +74,7 @@ The macOS implementation uses CoreAudio framework for creating virtual audio dev
 
 ### Building
 
-The project uses **CMake** as the cross-platform build system. For detailed installation instructions, see [INSTALL.md](INSTALL.md).
+The project uses **CMake** as the cross-platform build system.
 
 **Quick Start:**
 
@@ -92,8 +92,11 @@ cmake --build .
 ctest --output-on-failure
 ```
 
-Platform-specific implementation details:
+**Documentation:**
+- [BUILD.md](BUILD.md) - Quick build reference
+- [INSTALL.md](INSTALL.md) - Detailed installation guide
 
+**Platform-specific implementation details:**
 - [Linux Implementation](linux/README.md)
 - [Windows Implementation](windows/README.md)
 - [macOS Implementation](macos/README.md)
