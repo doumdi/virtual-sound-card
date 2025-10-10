@@ -1,5 +1,7 @@
 # Virtual Sound Card Driver
 
+[![CI](https://github.com/doumdi/virtual-sound-card/actions/workflows/ci.yml/badge.svg)](https://github.com/doumdi/virtual-sound-card/actions/workflows/ci.yml)
+
 A cross-platform virtual sound card driver supporting Linux, Windows, and macOS with configurable input/output channels and MIDI support.
 
 ## Project Overview
