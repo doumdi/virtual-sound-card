@@ -48,6 +48,12 @@ When building on Linux with ALSA support:
 - `linux/sine_generator_app` - Sine wave generator application
 - `linux/test_loopback_read` - Loopback device verification test
 
+### Windows-Specific Output
+
+When building on Windows with WASAPI support:
+- `windows/sine_generator_app.exe` - Sine wave generator application
+- `windows/test_loopback_read.exe` - Loopback device verification test
+
 ## Installation
 
 ```bash
@@ -70,9 +76,24 @@ ctest --output-on-failure --verbose
 # Run specific test
 ./tests/test_sine_generator
 
-# Play generated test audio
+# Play generated test audio (Linux/macOS)
 aplay tests/test_sine_440hz.wav  # Linux
 afplay tests/test_sine_440hz.wav  # macOS
+```
+
+### Windows Testing
+
+```cmd
+REM Run tests
+ctest --output-on-failure
+
+REM Run Windows demo
+cd windows
+demo.bat
+
+REM Run programs manually
+build\sine_generator_app.exe 440 5
+build\test_loopback_read.exe
 ```
 
 ## Cleaning

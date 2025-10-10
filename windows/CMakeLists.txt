@@ -1,8 +1,32 @@
 # Windows Virtual Sound Card Implementation
-# Placeholder for future WDM/WASAPI-based implementation
+# Uses WASAPI for user-mode audio applications
 
-message(STATUS "Windows implementation not yet available")
-message(STATUS "Future implementation will use WDM/WASAPI")
+message(STATUS "Configuring Windows implementation with WASAPI")
 
-# TODO: Add Windows-specific build targets when implementation is ready
-# For now, this is a placeholder to support the CMake build structure
+if(WIN32)
+    message(STATUS "Building Windows WASAPI programs")
+    
+    # Sine wave generator application
+    add_executable(sine_generator_app userspace/sine_generator_app.c)
+    target_link_libraries(sine_generator_app ole32)
+    
+    # Loopback read test
+    add_executable(test_loopback_read tests/test_loopback_read.c)
+    target_link_libraries(test_loopback_read ole32)
+    
+    message(STATUS "Windows WASAPI programs configured")
+    message(STATUS "  - sine_generator_app: Generates sine wave to default audio output")
+    message(STATUS "  - test_loopback_read: Reads and verifies audio from default capture device")
+    message(STATUS "")
+    message(STATUS "Note: For virtual loopback, install a virtual audio cable driver")
+    message(STATUS "      (e.g., VB-Cable, Virtual Audio Cable)")
+else()
+    message(STATUS "Not building on Windows - creating stub programs")
+    
+    # Create stub programs that inform users to build on Windows
+    add_executable(sine_generator_app userspace/sine_generator_app.c)
+    add_executable(test_loopback_read tests/test_loopback_read.c)
+    
+    message(STATUS "Stub programs created for cross-platform compatibility")
+    message(STATUS "These programs require Windows to run properly")
+endif()
