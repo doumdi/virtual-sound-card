@@ -2,6 +2,10 @@
 
 This directory contains the Linux implementation of the virtual sound card driver using ALSA (Advanced Linux Sound Architecture).
 
+**Quick Start:** See [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide.
+
+**Demo:** Run `./demo.sh` for an automated demonstration.
+
 ## Overview
 
 The Linux driver creates a virtual ALSA device that can be used by any application supporting ALSA or PulseAudio.
