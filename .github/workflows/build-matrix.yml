@@ -1,0 +1,98 @@
+name: Build Matrix
+
+on:
+  schedule:
+    # Run weekly on Mondays at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+jobs:
+  build-matrix:
+    name: ${{ matrix.os }} - ${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux with GCC
+          - os: ubuntu-latest
+            compiler: gcc
+            cc: gcc
+            cxx: g++
+            platform: LINUX
+            
+          # Linux with Clang
+          - os: ubuntu-latest
+            compiler: clang
+            cc: clang
+            cxx: clang++
+            platform: LINUX
+            
+          # macOS with Clang
+          - os: macos-latest
+            compiler: clang
+            cc: clang
+            cxx: clang++
+            platform: MACOS
+            
+          # Windows with MSVC
+          - os: windows-latest
+            compiler: msvc
+            platform: WINDOWS
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Linux dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake build-essential libasound2-dev
+        if [ "${{ matrix.compiler }}" = "clang" ]; then
+          sudo apt-get install -y clang
+        fi
+        
+    - name: Install macOS dependencies
+      if: runner.os == 'macOS'
+      run: |
+        brew install cmake
+        
+    - name: Setup MSVC
+      if: runner.os == 'Windows'
+      uses: microsoft/setup-msbuild@v2
+      
+    - name: Configure CMake (Unix)
+      if: runner.os != 'Windows'
+      env:
+        CC: ${{ matrix.cc }}
+        CXX: ${{ matrix.cxx }}
+      run: |
+        mkdir build
+        cd build
+        cmake -DBUILD_${{ matrix.platform }}=ON -DBUILD_TESTS=ON ..
+        
+    - name: Configure CMake (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        mkdir build
+        cd build
+        cmake -DBUILD_${{ matrix.platform }}=ON -DBUILD_TESTS=ON ..
+        
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config Release
+        
+    - name: Run tests (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        cd build
+        ctest --output-on-failure --verbose
+        
+    - name: Run tests (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cd build
+        ctest -C Release --output-on-failure --verbose
