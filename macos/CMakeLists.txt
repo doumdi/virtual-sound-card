@@ -28,6 +28,11 @@ if(APPLE)
             DESTINATION bin
             RENAME vcard-setup-macos)
     
+    # Install demo script
+    install(PROGRAMS demo.sh
+            DESTINATION bin
+            RENAME vcard-demo-macos)
+    
     message(STATUS "macOS CoreAudio programs configured")
     message(STATUS "  - sine_generator_app: Generates sine wave to default audio output")
     message(STATUS "  - virtual_sine_device: Virtual sine wave device for loopback")
