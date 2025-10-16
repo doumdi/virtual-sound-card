@@ -179,7 +179,7 @@ ctest -C Release --output-on-failure
 
 #### Installation
 
-The current Windows implementation provides WASAPI userspace applications. For virtual audio loopback functionality, you need to install a virtual audio cable driver (similar to BlackHole on macOS or ALSA loopback on Linux).
+The current Windows implementation provides WASAPI userspace applications. For virtual audio loopback functionality, you need to install a third-party virtual audio cable driver (similar to BlackHole on macOS or ALSA loopback on Linux).
 
 **Install Programs:**
 ```cmd
@@ -401,8 +401,8 @@ For audio loopback functionality (routing audio between applications), each plat
 | Platform | Built-in Solution | Third-Party Solutions | Recommendation |
 |----------|------------------|----------------------|----------------|
 | **Linux** | `snd-aloop` (ALSA loopback kernel module) | JACK Audio, PipeWire | Use built-in `snd-aloop` |
-| **macOS** | None | BlackHole, Soundflower, JACK Audio | BlackHole (free, open-source) |
-| **Windows** | None | VB-Cable, Voicemeeter, Virtual Audio Cable, JACK Audio | VB-Cable (free, easy) or Voicemeeter (free, advanced) |
+| **macOS** | None | BlackHole, Soundflower, JACK Audio | BlackHole (free, recommended) |
+| **Windows** | None | VB-Cable, Voicemeeter, Virtual Audio Cable, JACK Audio | VB-Cable (free, recommended) |
 
 **Usage Pattern:**
 - **Linux**: `modprobe snd-aloop` creates loopback devices automatically
