@@ -8,11 +8,11 @@ if(WIN32)
     
     # Sine wave generator application
     add_executable(sine_generator_app userspace/sine_generator_app.c)
-    target_link_libraries(sine_generator_app ole32)
+    target_link_libraries(sine_generator_app ole32 uuid)
     
     # Loopback read test
     add_executable(test_loopback_read tests/test_loopback_read.c)
-    target_link_libraries(test_loopback_read ole32)
+    target_link_libraries(test_loopback_read ole32 uuid)
     
     message(STATUS "Windows WASAPI programs configured")
     message(STATUS "  - sine_generator_app: Generates sine wave to default audio output")

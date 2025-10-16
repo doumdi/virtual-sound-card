@@ -8,7 +8,7 @@ CC = cl
 
 # Common flags
 CFLAGS = /W3 /O2 /D_CRT_SECURE_NO_WARNINGS
-LDFLAGS = ole32.lib
+LDFLAGS = ole32.lib uuid.lib
 
 # Directories
 USERSPACE_DIR = userspace
