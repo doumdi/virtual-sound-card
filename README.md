@@ -83,12 +83,14 @@ cmake --build .
 # Install a virtual audio cable (e.g., VB-Cable)
 # Download from: https://vb-audio.com/Cable/
 
-# Run sine generator to test
+# Run continuous sine wave generator to VB-Cable
 cd windows/Release
-sine_generator_app.exe 440 10
+virtual_sine_device.exe -d "CABLE Input" -f 440
 ```
 
 Audio can be routed between applications using the virtual audio cable devices.
+
+The `virtual_sine_device.exe` program is the Windows equivalent of the macOS `virtual_sine_device` program, providing continuous sine wave generation to any audio device (including VB-Cable).
 
 ### macOS
 The macOS implementation uses CoreAudio framework for creating virtual audio devices.

@@ -38,6 +38,30 @@ Similar to Linux's ALSA loopback (`snd-aloop`) and macOS's BlackHole, Windows ha
 
 These solutions provide the same core functionality as BlackHole on macOS and ALSA loopback on Linux, allowing applications to route audio between each other through virtual devices.
 
+## Quick Example with VB-Cable
+
+The `virtual_sine_device` program demonstrates virtual audio loopback on Windows:
+
+```cmd
+# 1. Install VB-Cable from https://vb-audio.com/Cable/
+
+# 2. Build the project
+mkdir build && cd build
+cmake -DBUILD_WINDOWS=ON ..
+cmake --build . --config Release
+
+# 3. Generate continuous sine wave to VB-Cable
+cd windows\Release
+virtual_sine_device.exe -d "CABLE Input" -f 440
+
+# 4. In another application, record from "CABLE Output"
+# The application will receive the 440Hz sine wave
+```
+
+This is equivalent to:
+- **Linux**: `sine_generator_app` playing to `hw:Loopback,0,0`
+- **macOS**: `virtual_sine_device -d "BlackHole 2ch" -f 440`
+
 ## Architecture
 
 The implementation consists of:

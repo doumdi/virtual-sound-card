@@ -119,7 +119,7 @@ This is the Windows equivalent of:
 
 ## Test
 
-### Quick Test
+### Quick Test with Default Device
 
 **Terminal 1** - Generate audio:
 ```cmd
@@ -128,12 +128,58 @@ sine_generator_app.exe 440 10
 
 This plays a 440 Hz sine wave for 10 seconds through your default audio output.
 
+### Virtual Loopback Test with VB-Cable
+
+This demonstrates the Windows equivalent of macOS's BlackHole and Linux's ALSA loopback.
+
+**Setup:**
+1. Install VB-Cable (creates "CABLE Input" and "CABLE Output" devices)
+2. Build the project including `virtual_sine_device.exe`
+
+**Terminal 1** - Generate continuous sine wave to VB-Cable:
+```cmd
+virtual_sine_device.exe -d "CABLE Input" -f 440
+```
+
+The program will run continuously, outputting a 440Hz sine wave to VB-Cable.
+
 **Terminal 2** - Verify audio (requires virtual cable):
 ```cmd
 test_loopback_read.exe
 ```
 
-### With Virtual Cable
+You should see:
+```
+=== Analysis Results ===
+Signal amplitude OK (RMS: x.xxxx, mean: x.xxxx)
+Detected frequency: 440.xx Hz
+PASS: Frequency within tolerance (x.xx Hz)
+
+=== TEST PASSED ===
+```
+
+### Virtual Sine Device Options
+
+List available audio devices:
+```cmd
+virtual_sine_device.exe -l
+```
+
+Generate different frequencies to VB-Cable:
+```cmd
+# 440 Hz (A4) to VB-Cable
+virtual_sine_device.exe -d "CABLE Input" -f 440
+
+# 880 Hz (A5) with lower amplitude
+virtual_sine_device.exe -d "CABLE Input" -f 880 -a 0.3
+
+# Middle C (261.63 Hz)
+virtual_sine_device.exe -d "CABLE Input" -f 261.63
+```
+
+Press Ctrl+C to stop the sine wave generator.
+
+### With Virtual Cable (Legacy Method)
 
 1. Set VB-Cable Input as your default playback device:
    ```cmd
