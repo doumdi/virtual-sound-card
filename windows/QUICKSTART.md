@@ -74,26 +74,52 @@ windows\sine_generator_app.exe
 
 The current implementation uses WASAPI for user-mode audio testing.
 
-### For Virtual Loopback Testing
+### Virtual Audio Cable Setup (Windows Loopback Solution)
 
-Install a virtual audio cable driver:
+Similar to Linux's `snd-aloop` and macOS's BlackHole, Windows requires a virtual audio cable driver for loopback functionality. Choose one of these options:
 
-**Option 1: VB-Cable (Free)**
+**Option 1: VB-Cable (Free, Recommended for beginners)**
 - Download from: https://vb-audio.com/Cable/
+- Run the installer as Administrator
 - Install VB-Cable
 - Restart if prompted
+- Creates: "CABLE Input" (playback) and "CABLE Output" (recording) devices
 
-**Option 2: Virtual Audio Cable (Commercial)**
+**Option 2: Voicemeeter (Free, Advanced features)**
+- Download from: https://vb-audio.com/Voicemeeter/
+- Includes virtual audio cables plus mixing capabilities
+- Best for complex audio routing scenarios
+- GUI for real-time audio management
+
+**Option 3: Virtual Audio Cable (Commercial, Professional)**
 - Download from: https://vac.muzychenko.net/en/
-- Install and configure
+- Supports multiple virtual cables (up to 256)
+- Advanced configuration and low latency
+- Best for professional audio production
+
+**Option 4: JACK Audio (Free, Professional)**
+- Download from: https://jackaudio.org/
+- Cross-platform audio routing server
+- Best for complex setups requiring MIDI and audio routing
 
 After installation, the virtual audio devices will appear in:
 - Sound Control Panel (mmsys.cpl)
 - Settings > System > Sound
 
+### How Virtual Audio Cables Work
+
+Virtual audio cables work like physical audio cables but in software:
+- **Playback device** (e.g., "CABLE Input"): Applications play audio to this
+- **Recording device** (e.g., "CABLE Output"): Applications record audio from this
+- Audio flows: App A → CABLE Input → CABLE Output → App B
+
+This is the Windows equivalent of:
+- **Linux**: ALSA loopback (`hw:Loopback,0,0` → `hw:Loopback,1,0`)
+- **macOS**: BlackHole (write to BlackHole → read from BlackHole)
+
 ## Test
 
-### Quick Test
+### Quick Test with Default Device
 
 **Terminal 1** - Generate audio:
 ```cmd
@@ -102,12 +128,58 @@ sine_generator_app.exe 440 10
 
 This plays a 440 Hz sine wave for 10 seconds through your default audio output.
 
+### Virtual Loopback Test with VB-Cable
+
+This demonstrates the Windows equivalent of macOS's BlackHole and Linux's ALSA loopback.
+
+**Setup:**
+1. Install VB-Cable (creates "CABLE Input" and "CABLE Output" devices)
+2. Build the project including `virtual_sine_device.exe`
+
+**Terminal 1** - Generate continuous sine wave to VB-Cable:
+```cmd
+virtual_sine_device.exe -d "CABLE Input" -f 440
+```
+
+The program will run continuously, outputting a 440Hz sine wave to VB-Cable.
+
 **Terminal 2** - Verify audio (requires virtual cable):
 ```cmd
 test_loopback_read.exe
 ```
 
-### With Virtual Cable
+You should see:
+```
+=== Analysis Results ===
+Signal amplitude OK (RMS: x.xxxx, mean: x.xxxx)
+Detected frequency: 440.xx Hz
+PASS: Frequency within tolerance (x.xx Hz)
+
+=== TEST PASSED ===
+```
+
+### Virtual Sine Device Options
+
+List available audio devices:
+```cmd
+virtual_sine_device.exe -l
+```
+
+Generate different frequencies to VB-Cable:
+```cmd
+# 440 Hz (A4) to VB-Cable
+virtual_sine_device.exe -d "CABLE Input" -f 440
+
+# 880 Hz (A5) with lower amplitude
+virtual_sine_device.exe -d "CABLE Input" -f 880 -a 0.3
+
+# Middle C (261.63 Hz)
+virtual_sine_device.exe -d "CABLE Input" -f 261.63
+```
+
+Press Ctrl+C to stop the sine wave generator.
+
+### With Virtual Cable (Legacy Method)
 
 1. Set VB-Cable Input as your default playback device:
    ```cmd
@@ -281,11 +353,14 @@ pnputil /add-driver VirtualSoundCard.inf /install
 
 ## Resources
 
-### Virtual Audio Cables
+### Virtual Audio Cables (Windows Loopback Solutions)
 
-- VB-Cable (Free): https://vb-audio.com/Cable/
-- Virtual Audio Cable: https://vac.muzychenko.net/en/
-- Voicemeeter (includes virtual audio): https://vb-audio.com/Voicemeeter/
+These are the Windows equivalents to Linux's ALSA loopback and macOS's BlackHole:
+
+- **VB-Cable (Free)**: https://vb-audio.com/Cable/
+- **Voicemeeter (Free)**: https://vb-audio.com/Voicemeeter/
+- **Virtual Audio Cable (Commercial)**: https://vac.muzychenko.net/en/
+- **JACK Audio (Free)**: https://jackaudio.org/
 
 ### Windows Audio Development
 

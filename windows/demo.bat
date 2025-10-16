@@ -1,6 +1,6 @@
 @echo off
 REM Demo script for Windows Virtual Sound Card
-REM This script demonstrates the sine wave generator and verification test
+REM This script demonstrates the virtual sine wave device with VB-Cable loopback
 
 setlocal EnableDelayedExpansion
 
@@ -10,8 +10,8 @@ echo ========================================
 echo.
 
 REM Check if programs exist
-if not exist "build\sine_generator_app.exe" (
-    echo Error: Programs not built. Run 'nmake' first.
+if not exist "build\virtual_sine_device.exe" (
+    echo Error: Programs not built. Run 'nmake' or 'cmake --build .' first.
     exit /b 1
 )
 
@@ -35,58 +35,71 @@ echo.
 
 REM Demo parameters
 set FREQUENCY=440
-set DURATION=5
+set DURATION=10
 
 echo Demo Configuration:
 echo   Frequency: %FREQUENCY% Hz (A4 note)
-echo   Duration: %DURATION% seconds
+echo   Program: virtual_sine_device.exe
 echo.
 
-echo Note: For loopback testing, you need a virtual audio cable installed.
-echo       Recommended: VB-Cable (https://vb-audio.com/Cable/)
-echo.
-echo If you don't have a virtual audio cable, this demo will play audio
-echo through your default output device. You can hear it but loopback
-echo verification will not work.
+echo This demo showcases the Windows equivalent of:
+echo   - macOS: virtual_sine_device with BlackHole
+echo   - Linux: sine_generator_app with ALSA loopback
 echo.
 
-pause
-
-echo Starting sine wave generator...
-echo.
-
-REM Run sine generator in background
-start /B "Sine Generator" build\sine_generator_app.exe %FREQUENCY% %DURATION% > nul 2>&1
-
-REM Give it a moment to start
-timeout /t 2 /nobreak >nul
-
-echo Sine generator started
-echo Playing %FREQUENCY% Hz sine wave for %DURATION% seconds...
-echo You should hear the tone through your speakers/headphones
-echo.
-
-REM Wait for playback to complete
-timeout /t %DURATION% /nobreak
-
-echo.
-echo Playback complete!
-echo.
 echo ========================================
-echo Demo Information
+echo Checking for VB-Cable Installation
 echo ========================================
 echo.
-echo What just happened:
-echo   1. A sine wave generator started
-echo   2. It played a %FREQUENCY% Hz tone for %DURATION% seconds
-echo   3. Audio was sent to your default audio output device
+
+REM List available devices
+echo Available audio output devices:
+build\virtual_sine_device.exe -l
+
 echo.
-echo For full loopback testing:
-echo   1. Install a virtual audio cable (e.g., VB-Cable)
-echo   2. Set it as your default playback device
-echo   3. Run: build\sine_generator_app.exe (in one terminal)
-echo   4. Run: build\test_loopback_read.exe (in another terminal)
-echo   5. The test will verify the audio signal
+echo ========================================
+echo Demo Options
+echo ========================================
+echo.
+echo Choose an option:
+echo   1. Play to default device (you can hear it)
+echo   2. Play to VB-Cable "CABLE Input" (for loopback testing)
+echo   3. Exit
+echo.
+
+set /p choice="Enter choice (1-3): "
+
+if "%choice%"=="1" (
+    echo.
+    echo Playing sine wave to default device...
+    echo Press Ctrl+C to stop
+    echo.
+    build\virtual_sine_device.exe -f %FREQUENCY%
+) else if "%choice%"=="2" (
+    echo.
+    echo Playing sine wave to VB-Cable...
+    echo.
+    echo If VB-Cable is installed, open another terminal and run:
+    echo   build\test_loopback_read.exe
+    echo.
+    echo Press Ctrl+C to stop
+    echo.
+    build\virtual_sine_device.exe -d "CABLE Input" -f %FREQUENCY%
+) else (
+    echo Exiting demo
+    exit /b 0
+)
+
+echo.
+echo ========================================
+echo Demo Complete
+echo ========================================
+echo.
+echo For full loopback testing with VB-Cable:
+echo   1. Install VB-Cable from https://vb-audio.com/Cable/
+echo   2. Terminal 1: build\virtual_sine_device.exe -d "CABLE Input" -f 440
+echo   3. Terminal 2: build\test_loopback_read.exe
+echo   4. The test will verify the audio signal
 echo.
 echo See QUICKSTART.md for detailed instructions
 echo ========================================
