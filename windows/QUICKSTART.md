@@ -74,22 +74,48 @@ windows\sine_generator_app.exe
 
 The current implementation uses WASAPI for user-mode audio testing.
 
-### For Virtual Loopback Testing
+### Virtual Audio Cable Setup (Windows Loopback Solution)
 
-Install a virtual audio cable driver:
+Similar to Linux's `snd-aloop` and macOS's BlackHole, Windows requires a virtual audio cable driver for loopback functionality. Choose one of these options:
 
-**Option 1: VB-Cable (Free)**
+**Option 1: VB-Cable (Free, Recommended for beginners)**
 - Download from: https://vb-audio.com/Cable/
+- Run the installer as Administrator
 - Install VB-Cable
 - Restart if prompted
+- Creates: "CABLE Input" (playback) and "CABLE Output" (recording) devices
 
-**Option 2: Virtual Audio Cable (Commercial)**
+**Option 2: Voicemeeter (Free, Advanced features)**
+- Download from: https://vb-audio.com/Voicemeeter/
+- Includes virtual audio cables plus mixing capabilities
+- Best for complex audio routing scenarios
+- GUI for real-time audio management
+
+**Option 3: Virtual Audio Cable (Commercial, Professional)**
 - Download from: https://vac.muzychenko.net/en/
-- Install and configure
+- Supports multiple virtual cables (up to 256)
+- Advanced configuration and low latency
+- Best for professional audio production
+
+**Option 4: JACK Audio (Free, Professional)**
+- Download from: https://jackaudio.org/
+- Cross-platform audio routing server
+- Best for complex setups requiring MIDI and audio routing
 
 After installation, the virtual audio devices will appear in:
 - Sound Control Panel (mmsys.cpl)
 - Settings > System > Sound
+
+### How Virtual Audio Cables Work
+
+Virtual audio cables work like physical audio cables but in software:
+- **Playback device** (e.g., "CABLE Input"): Applications play audio to this
+- **Recording device** (e.g., "CABLE Output"): Applications record audio from this
+- Audio flows: App A → CABLE Input → CABLE Output → App B
+
+This is the Windows equivalent of:
+- **Linux**: ALSA loopback (`hw:Loopback,0,0` → `hw:Loopback,1,0`)
+- **macOS**: BlackHole (write to BlackHole → read from BlackHole)
 
 ## Test
 
@@ -281,11 +307,14 @@ pnputil /add-driver VirtualSoundCard.inf /install
 
 ## Resources
 
-### Virtual Audio Cables
+### Virtual Audio Cables (Windows Loopback Solutions)
 
-- VB-Cable (Free): https://vb-audio.com/Cable/
-- Virtual Audio Cable: https://vac.muzychenko.net/en/
-- Voicemeeter (includes virtual audio): https://vb-audio.com/Voicemeeter/
+These are the Windows equivalents to Linux's ALSA loopback and macOS's BlackHole:
+
+- **VB-Cable (Free)**: https://vb-audio.com/Cable/
+- **Voicemeeter (Free)**: https://vb-audio.com/Voicemeeter/
+- **Virtual Audio Cable (Commercial)**: https://vac.muzychenko.net/en/
+- **JACK Audio (Free)**: https://jackaudio.org/
 
 ### Windows Audio Development
 

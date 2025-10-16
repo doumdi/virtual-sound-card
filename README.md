@@ -27,6 +27,19 @@ virtual-sound-card/
 
 ## Platform-Specific Implementations
 
+### Cross-Platform Virtual Audio Solutions Comparison
+
+Each platform has different approaches to creating virtual audio devices for loopback and routing:
+
+| Platform | Solution | Type | Description |
+|----------|----------|------|-------------|
+| **Linux** | ALSA loopback (`snd-aloop`) | Kernel module | Built-in kernel module providing virtual audio devices |
+| **macOS** | BlackHole | System extension | Third-party virtual audio driver (free, open-source) |
+| **Windows** | VB-Cable | Kernel driver | Third-party virtual audio cable (free) |
+| **Windows** | Voicemeeter | Application + driver | Virtual mixer with audio cables (free) |
+| **Windows** | Virtual Audio Cable | Kernel driver | Professional multi-cable solution (commercial) |
+| **All** | JACK Audio | Audio server | Professional audio routing server (free, cross-platform) |
+
 ### Linux
 The Linux implementation uses ALSA (Advanced Linux Sound Architecture) or PulseAudio for creating virtual audio devices.
 
@@ -48,10 +61,34 @@ The Windows implementation uses Windows Driver Model (WDM) or WASAPI (Windows Au
 - WASAPI
 - C/C++
 
+**Virtual Audio Cable Solutions:**
+Similar to Linux's ALSA loopback and macOS's BlackHole, Windows has several third-party virtual audio cable solutions:
+- VB-Cable (Free) - Basic virtual audio routing
+- Voicemeeter (Free) - Advanced virtual audio mixer
+- Virtual Audio Cable (Commercial) - Professional multi-cable solution
+- JACK Audio (Free) - Professional audio routing server
+
 **Requirements:**
 - Windows 10/11 SDK
 - Visual Studio 2019 or later
 - Windows Driver Kit (WDK)
+
+**Quick Start:**
+```bash
+# Build virtual sound card userspace tools
+mkdir build && cd build
+cmake -DBUILD_WINDOWS=ON ..
+cmake --build .
+
+# Install a virtual audio cable (e.g., VB-Cable)
+# Download from: https://vb-audio.com/Cable/
+
+# Run sine generator to test
+cd windows/Release
+sine_generator_app.exe 440 10
+```
+
+Audio can be routed between applications using the virtual audio cable devices.
 
 ### macOS
 The macOS implementation uses CoreAudio framework for creating virtual audio devices.

@@ -6,6 +6,38 @@ This directory contains the Windows implementation of the virtual sound card dri
 
 The Windows driver creates a virtual audio device that appears in the Windows Sound Control Panel and can be used by any Windows audio application.
 
+### Virtual Audio Cable Solutions (Loopback)
+
+Similar to Linux's ALSA loopback (`snd-aloop`) and macOS's BlackHole, Windows has several virtual audio cable solutions for audio loopback and routing:
+
+#### Recommended Solutions
+
+1. **VB-Cable (Free)** - [Download](https://vb-audio.com/Cable/)
+   - Free virtual audio device driver
+   - Creates one pair of virtual input/output devices
+   - Low latency and stable
+   - Best for basic virtual audio routing
+
+2. **Voicemeeter (Free)** - [Download](https://vb-audio.com/Voicemeeter/)
+   - Advanced virtual audio mixer with virtual I/O
+   - Includes virtual audio cable functionality
+   - Multiple virtual devices
+   - GUI for audio routing and mixing
+
+3. **Virtual Audio Cable (Commercial)** - [Download](https://vac.muzychenko.net/en/)
+   - Professional virtual audio cable driver
+   - Multiple virtual cables (up to 256)
+   - Low latency, high quality
+   - Advanced configuration options
+
+4. **JACK Audio Connection Kit** - [Download](https://jackaudio.org/)
+   - Professional audio server for low-latency routing
+   - Cross-platform solution
+   - Advanced MIDI and audio routing
+   - Best for complex audio setups
+
+These solutions provide the same core functionality as BlackHole on macOS and ALSA loopback on Linux, allowing applications to route audio between each other through virtual devices.
+
 ## Architecture
 
 The implementation consists of:
