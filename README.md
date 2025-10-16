@@ -64,7 +64,21 @@ The macOS implementation uses CoreAudio framework for creating virtual audio dev
 **Requirements:**
 - Xcode 12 or later
 - macOS SDK
-- Apple Developer account (for driver signing)
+- BlackHole or similar virtual audio driver (for loopback)
+
+**Quick Start:**
+```bash
+# Install BlackHole virtual audio driver
+brew install blackhole-2ch
+
+# Build and run virtual sine device
+mkdir build && cd build
+cmake -DBUILD_MACOS=ON ..
+cmake --build .
+./macos/virtual_sine_device -d "BlackHole 2ch" -f 440
+```
+
+Now applications can read sine wave audio from "BlackHole 2ch" as an input device.
 
 ## Getting Started
 
@@ -110,6 +124,7 @@ ctest --output-on-failure
 - [x] **Sine Wave Generator**: Test audio generation for verification
 - [x] **Test Suite**: Automated testing with CTest
 - [x] **Common API**: Cross-platform API definitions
+- [x] **macOS Virtual Device**: Virtual sine wave device using CoreAudio
 
 ### Planned
 - [ ] Configurable number of input channels (1-32)
@@ -168,7 +183,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 
 - **Linux**: ✅ ALSA loopback implementation with userspace tools
 - **Windows**: ✅ WASAPI userspace implementation (WDM driver in progress)
-- **macOS**: ⚠️ CoreAudio implementation planned
+- **macOS**: ✅ Virtual sine wave device with CoreAudio (HAL plugin in progress)
 
 ### What's Working
 
@@ -176,6 +191,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 - Common audio utilities and sine wave generation
 - Linux ALSA loopback device integration
 - Windows WASAPI audio playback and capture
+- **macOS virtual sine wave device with loopback support**
 - Comprehensive test suite
 
 ### Next Steps

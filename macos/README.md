@@ -4,7 +4,32 @@ This directory contains the macOS implementation of the virtual sound card drive
 
 ## Overview
 
-The macOS driver creates a virtual audio device using CoreAudio's Audio Hardware Abstraction Layer (HAL). The device appears in System Preferences and can be used by any CoreAudio-compatible application.
+The macOS driver creates a virtual audio device using CoreAudio framework. The device appears in System Preferences and can be used by any CoreAudio-compatible application.
+
+### Quick Start: Virtual Sine Wave Device
+
+For immediate use, we provide a **virtual sine wave device** that generates a sine wave when applications read from it:
+
+1. Install BlackHole (virtual audio driver):
+   ```bash
+   brew install blackhole-2ch
+   ```
+
+2. Build the project:
+   ```bash
+   mkdir build && cd build
+   cmake -DBUILD_MACOS=ON ..
+   cmake --build .
+   ```
+
+3. Start the virtual sine device:
+   ```bash
+   ./macos/virtual_sine_device -d "BlackHole 2ch" -f 440
+   ```
+
+4. Applications can now read sine wave audio from "BlackHole 2ch" as an input device.
+
+See [VIRTUAL_DEVICE.md](VIRTUAL_DEVICE.md) for detailed documentation.
 
 ## Architecture
 
