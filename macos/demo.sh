@@ -76,24 +76,31 @@ sleep 3
 
 # Run virtual sine device for 10 seconds in background
 echo "Running virtual sine device..."
-timeout 10 ./build/macos/virtual_sine_device -d "$DEVICE_NAME" -f 440 &
+./build/macos/virtual_sine_device -d "$DEVICE_NAME" -f 440 &
 SINE_PID=$!
 
+# Wait for it to start
 sleep 2
 
 echo ""
 echo "Step 4: Testing loopback (optional)"
 echo "===================================="
 echo ""
+echo "The virtual device is running in the background."
 echo "You can test the loopback by recording from $DEVICE_NAME:"
 echo "  sox -t coreaudio \"$DEVICE_NAME\" test_output.wav trim 0 5"
 echo ""
 echo "Or use QuickTime Player:"
 echo "  File → New Audio Recording → Select '$DEVICE_NAME' as microphone"
 echo ""
+echo "Letting it run for 8 more seconds..."
+sleep 8
 
-# Wait for virtual sine device to finish
-wait $SINE_PID
+# Stop the virtual sine device
+echo ""
+echo "Stopping virtual sine device..."
+kill $SINE_PID 2>/dev/null || true
+wait $SINE_PID 2>/dev/null || true
 
 echo ""
 echo "Demo complete!"
