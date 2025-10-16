@@ -179,6 +179,9 @@ ctest -C Release --output-on-failure
 
 #### Installation
 
+The current Windows implementation provides WASAPI userspace applications. For virtual audio loopback functionality, you need to install a virtual audio cable driver (similar to BlackHole on macOS or ALSA loopback on Linux).
+
+**Install Programs:**
 ```cmd
 # Install (requires administrator privileges)
 cmake --install . --config Release
@@ -186,6 +189,40 @@ cmake --install . --config Release
 # Install to custom location
 cmake --install . --config Release --prefix "C:\Program Files\VirtualSoundCard"
 ```
+
+**Install Virtual Audio Cable (Required for Loopback):**
+
+Choose one of these Windows virtual audio cable solutions:
+
+1. **VB-Cable (Free, Recommended)**
+   - Download from: https://vb-audio.com/Cable/
+   - Run installer as Administrator
+   - Creates: "CABLE Input" (playback) and "CABLE Output" (recording)
+
+2. **Voicemeeter (Free, Advanced)**
+   - Download from: https://vb-audio.com/Voicemeeter/
+   - Includes virtual audio cables plus audio mixer GUI
+
+3. **Virtual Audio Cable (Commercial)**
+   - Download from: https://vac.muzychenko.net/en/
+   - Professional solution with multiple cables
+
+4. **JACK Audio (Free, Professional)**
+   - Download from: https://jackaudio.org/
+   - Cross-platform audio routing server
+
+**Testing:**
+```cmd
+# Generate a 440Hz sine wave (default device)
+sine_generator_app.exe 440 10
+
+# For loopback testing:
+# 1. Set "CABLE Input" as default playback device
+# 2. In terminal 1: sine_generator_app.exe 440 10
+# 3. In terminal 2: test_loopback_read.exe
+```
+
+For detailed Windows usage, see [windows/QUICKSTART.md](windows/QUICKSTART.md).
 
 ### macOS
 
@@ -356,6 +393,23 @@ After successful installation:
    - [windows/README.md](windows/README.md)
    - [macos/README.md](macos/README.md)
 3. **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines
+
+## Virtual Audio Loopback Solutions by Platform
+
+For audio loopback functionality (routing audio between applications), each platform has different solutions:
+
+| Platform | Built-in Solution | Third-Party Solutions | Recommendation |
+|----------|------------------|----------------------|----------------|
+| **Linux** | `snd-aloop` (ALSA loopback kernel module) | JACK Audio, PipeWire | Use built-in `snd-aloop` |
+| **macOS** | None | BlackHole, Soundflower, JACK Audio | BlackHole (free, open-source) |
+| **Windows** | None | VB-Cable, Voicemeeter, Virtual Audio Cable, JACK Audio | VB-Cable (free, easy) or Voicemeeter (free, advanced) |
+
+**Usage Pattern:**
+- **Linux**: `modprobe snd-aloop` creates loopback devices automatically
+- **macOS**: Install BlackHole, then use "BlackHole 2ch" as audio device
+- **Windows**: Install VB-Cable, then use "CABLE Input" (playback) and "CABLE Output" (recording)
+
+All three solutions allow applications to route audio through virtual devices without physical audio cables.
 
 ## Support
 
