@@ -10,6 +10,7 @@
 
 #ifdef _WIN32
 
+#define COBJMACROS
 #include <windows.h>
 #include <mmdeviceapi.h>
 #include <audioclient.h>

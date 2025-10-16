@@ -110,7 +110,7 @@ static OSStatus input_callback(void *inRefCon,
 	bufferList.mBuffers[0].mData = malloc(bufferList.mBuffers[0].mDataByteSize);
 	
 	if (bufferList.mBuffers[0].mData == NULL) {
-		return memFullErr;
+		return kAudioHardwareUnspecifiedError;
 	}
 	
 	// Render audio
@@ -142,7 +142,7 @@ static AudioDeviceID get_default_input_device(void)
 	AudioObjectPropertyAddress property_address = {
 		kAudioHardwarePropertyDefaultInputDevice,
 		kAudioObjectPropertyScopeGlobal,
-		kAudioObjectPropertyElementMaster
+		kAudioObjectPropertyElementMain
 	};
 	
 	OSStatus err = AudioObjectGetPropertyData(kAudioObjectSystemObject,
