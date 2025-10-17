@@ -88,6 +88,42 @@ Available options:
 - `BUILD_LINUX` (default: auto-detect) - Build Linux implementation
 - `BUILD_WINDOWS` (default: auto-detect) - Build Windows implementation
 - `BUILD_MACOS` (default: auto-detect) - Build macOS implementation
+- `BUILD_JACK` (default: ON) - Build JACK2 cross-platform implementation
+
+### Building with JACK2 Support
+
+JACK Audio Connection Kit provides professional, low-latency, cross-platform audio routing.
+
+**Install JACK2:**
+
+```bash
+# Linux (Ubuntu/Debian)
+sudo apt-get install jackd2 libjack-jackd2-dev qjackctl
+
+# Linux (Fedora/RHEL)
+sudo dnf install jack-audio-connection-kit-devel qjackctl
+
+# macOS
+brew install jack
+
+# Windows
+# Download installer from https://jackaudio.org/downloads/
+```
+
+**Build with JACK:**
+
+```bash
+cd virtual-sound-card
+mkdir build && cd build
+cmake -DBUILD_JACK=ON ..
+cmake --build .
+
+# Run JACK demo
+../jack_demo.sh     # Linux/macOS
+..\jack_demo.bat    # Windows
+```
+
+**Note:** If JACK is not installed, the build will skip JACK programs but continue successfully.
 
 ## Platform-Specific Instructions
 
@@ -100,11 +136,20 @@ Available options:
 sudo apt-get update
 sudo apt-get install build-essential cmake git libasound2-dev alsa-utils
 
+# Optional: Install JACK2 for cross-platform audio routing
+sudo apt-get install jackd2 libjack-jackd2-dev qjackctl
+
 # Fedora/RHEL
 sudo dnf install cmake gcc gcc-c++ git alsa-lib-devel alsa-utils
 
+# Optional: Install JACK2
+sudo dnf install jack-audio-connection-kit-devel qjackctl
+
 # Arch Linux
 sudo pacman -S base-devel cmake git alsa-lib alsa-utils
+
+# Optional: Install JACK2
+sudo pacman -S jack2 qjackctl
 ```
 
 #### Building

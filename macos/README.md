@@ -6,6 +6,8 @@ This directory contains the macOS implementation of the virtual sound card drive
 
 The macOS driver creates a virtual audio device using CoreAudio framework. The device appears in System Preferences and can be used by any CoreAudio-compatible application.
 
+For cross-platform professional audio routing, see also: [JACK Audio Connection Kit](#jack-audio-connection-kit)
+
 ### Quick Start: Virtual Sine Wave Device
 
 For immediate use, we provide a **virtual sine wave device** that generates a sine wave when applications read from it:
@@ -31,6 +33,29 @@ For immediate use, we provide a **virtual sine wave device** that generates a si
 
 See [VIRTUAL_DEVICE.md](VIRTUAL_DEVICE.md) for detailed documentation.
 
+### JACK2 Quick Start (Cross-Platform)
+
+For professional audio routing that works on macOS, Linux, and Windows:
+
+1. Install JACK2:
+   ```bash
+   brew install jack
+   ```
+
+2. Build with JACK support:
+   ```bash
+   mkdir build && cd build
+   cmake -DBUILD_JACK=ON ..
+   cmake --build .
+   ```
+
+3. Start JACK server and run sine generator:
+   ```bash
+   jackd -d coreaudio
+   ./jack_sine_generator 440 10
+   # Or use: ../jack_demo.sh
+   ```
+
 ## Architecture
 
 The implementation consists of:
@@ -38,6 +63,7 @@ The implementation consists of:
 - **Kernel Extension (Legacy)**: KEXT-based driver for older macOS versions
 - **User Agent**: Background service for device management
 - **Configuration Utility**: Menu bar app for settings
+- **JACK Integration** (optional): Cross-platform professional audio routing
 
 ## Prerequisites
 
@@ -49,6 +75,11 @@ The implementation consists of:
 - Apple Developer account (for code signing)
 - Entitlements for DriverKit development
 
+### Optional: JACK2
+
+- JACK Audio Connection Kit: `brew install jack`
+- QjackCtl (GUI): `brew install qjackctl`
+
 ### Installation
 
 1. Install Xcode from Mac App Store
@@ -57,6 +88,10 @@ The implementation consists of:
    xcode-select --install
    ```
 3. Enroll in Apple Developer Program (required for driver signing)
+4. (Optional) Install JACK2 for cross-platform audio:
+   ```bash
+   brew install jack qjackctl
+   ```
 
 ## Building
 
@@ -236,6 +271,51 @@ codesign --sign "Apple Development: Your Name" --timestamp VirtualSoundCard.dext
 - DriverKit limitations: Some advanced features require kernel extension
 - SIP restrictions: Legacy KEXT requires SIP disabled on modern macOS
 
+## JACK Audio Connection Kit
+
+For professional, low-latency audio routing that works across macOS, Linux, and Windows:
+
+### Installation
+
+```bash
+# Install JACK2
+brew install jack
+
+# Optional: Install GUI control panel
+brew install qjackctl
+```
+
+### Usage
+
+```bash
+# Build with JACK support
+mkdir build && cd build
+cmake -DBUILD_JACK=ON ..
+cmake --build .
+
+# Start JACK server
+jackd -d coreaudio
+
+# Or use QjackCtl GUI
+qjackctl
+
+# Run JACK sine wave generator
+./jack_sine_generator 440 10
+
+# Or use the demo
+../jack_demo.sh
+```
+
+### Benefits of JACK
+
+- **Cross-platform**: Same code works on macOS, Linux, and Windows
+- **Low latency**: Optimized for real-time audio processing
+- **Professional routing**: Connect any audio application to any other
+- **Sample-accurate**: Precise synchronization between applications
+- **Active community**: Well-supported and widely used in audio production
+
+Learn more: https://jackaudio.org/
+
 ## References
 
 - [CoreAudio Documentation](https://developer.apple.com/documentation/coreaudio)
@@ -243,3 +323,4 @@ codesign --sign "Apple Development: Your Name" --timestamp VirtualSoundCard.dext
 - [Audio Hardware Abstraction Layer](https://developer.apple.com/library/archive/documentation/MusicAudio/Conceptual/CoreAudioOverview/)
 - [System Extensions Programming Guide](https://developer.apple.com/documentation/systemextensions)
 - [Audio Unit Extensions](https://developer.apple.com/documentation/audiotoolbox/audio_unit_v3_plug-ins)
+- [JACK Audio Connection Kit](https://jackaudio.org/)

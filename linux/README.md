@@ -10,12 +10,15 @@ This directory contains the Linux implementation of the virtual sound card drive
 
 The Linux driver creates a virtual ALSA device that can be used by any application supporting ALSA or PulseAudio.
 
+For cross-platform professional audio routing, see also: [JACK Audio Connection Kit](#jack-audio-connection-kit)
+
 ## Architecture
 
 The implementation uses:
 - **ALSA Loopback Module**: For basic audio routing
 - **Custom Kernel Module** (optional): For advanced features and lower latency
 - **User-space Control**: Configuration tools
+- **JACK2** (optional): For professional, low-latency cross-platform audio routing
 
 ## Prerequisites
 
@@ -25,11 +28,20 @@ The implementation uses:
 # Debian/Ubuntu
 sudo apt-get install build-essential linux-headers-$(uname -r) alsa-utils libasound2-dev
 
+# Optional: JACK2 for cross-platform audio
+sudo apt-get install jackd2 libjack-jackd2-dev qjackctl
+
 # Fedora/RHEL
 sudo dnf install kernel-devel alsa-lib-devel gcc make
 
+# Optional: JACK2
+sudo dnf install jack-audio-connection-kit-devel qjackctl
+
 # Arch Linux
 sudo pacman -S base-devel linux-headers alsa-utils alsa-lib
+
+# Optional: JACK2
+sudo pacman -S jack2 qjackctl
 ```
 
 ## Building
@@ -238,8 +250,58 @@ arecord -D hw:Loopback,1,0 -f cd -d 5 test.wav
 - On some systems, you may need to install `linux-modules-extra-$(uname -r)` package
 - Audio latency depends on buffer size and system load
 
+## JACK Audio Connection Kit
+
+For professional, low-latency audio routing that works across Linux, macOS, and Windows:
+
+### Installation
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install jackd2 libjack-jackd2-dev qjackctl
+
+# Fedora/RHEL
+sudo dnf install jack-audio-connection-kit-devel qjackctl
+
+# Arch Linux
+sudo pacman -S jack2 qjackctl
+```
+
+### Usage
+
+```bash
+# Start JACK server
+jackd -d alsa
+
+# Or use QjackCtl GUI
+qjackctl
+
+# Build with JACK support
+cd /path/to/virtual-sound-card
+mkdir build && cd build
+cmake -DBUILD_JACK=ON ..
+cmake --build .
+
+# Run JACK sine wave generator
+./jack_sine_generator 440 10
+
+# Or use the demo
+../jack_demo.sh
+```
+
+### Benefits of JACK
+
+- **Cross-platform**: Same code works on Linux, macOS, and Windows
+- **Low latency**: Optimized for real-time audio processing
+- **Professional routing**: Connect any audio application to any other
+- **Sample-accurate**: Precise synchronization between applications
+- **Active community**: Well-supported and widely used in audio production
+
+Learn more: https://jackaudio.org/
+
 ## References
 
 - [ALSA Driver Documentation](https://www.alsa-project.org/wiki/Main_Page)
 - [Linux Kernel Module Programming Guide](https://tldp.org/LDP/lkmpg/2.6/html/)
 - [Writing an ALSA Driver](https://www.kernel.org/doc/html/latest/sound/kernel-api/writing-an-alsa-driver.html)
+- [JACK Audio Connection Kit](https://jackaudio.org/)

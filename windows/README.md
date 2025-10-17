@@ -6,6 +6,8 @@ This directory contains the Windows implementation of the virtual sound card dri
 
 The Windows driver creates a virtual audio device that appears in the Windows Sound Control Panel and can be used by any Windows audio application.
 
+For cross-platform professional audio routing, see also: [JACK Audio Connection Kit](#jack-audio-connection-kit)
+
 ### Virtual Audio Cable Solutions (Loopback)
 
 Similar to Linux's ALSA loopback (`snd-aloop`) and macOS's BlackHole, Windows has several virtual audio cable solutions for audio loopback and routing:
@@ -30,11 +32,12 @@ Similar to Linux's ALSA loopback (`snd-aloop`) and macOS's BlackHole, Windows ha
    - Low latency, high quality
    - Advanced configuration options
 
-4. **JACK Audio Connection Kit** - [Download](https://jackaudio.org/)
+4. **JACK Audio Connection Kit (Free, Cross-Platform)** - [Download](https://jackaudio.org/)
    - Professional audio server for low-latency routing
-   - Cross-platform solution
+   - Cross-platform solution (Linux, macOS, Windows)
    - Advanced MIDI and audio routing
-   - Best for complex audio setups
+   - Best for complex audio setups and professional use
+   - **Recommended for cross-platform development**
 
 These solutions provide the same core functionality as BlackHole on macOS and ALSA loopback on Linux, allowing applications to route audio between each other through virtual devices.
 
@@ -211,9 +214,47 @@ signtool sign /v /s "PrivateCertStore" /n "TestCert" /t http://timestamp.digicer
 
 - None yet (project in development)
 
+## JACK Audio Connection Kit
+
+For professional, low-latency audio routing that works across Windows, Linux, and macOS:
+
+### Installation
+
+Download and install JACK2 for Windows from: https://jackaudio.org/downloads/
+
+### Usage
+
+```cmd
+REM Build with JACK support
+mkdir build
+cd build
+cmake -DBUILD_JACK=ON ..
+cmake --build . --config Release
+
+REM Start JACK server (or use QjackCtl GUI)
+jackd -d portaudio
+
+REM Run JACK sine wave generator
+jack_sine_generator.exe 440 10
+
+REM Or use the demo
+..\jack_demo.bat
+```
+
+### Benefits of JACK
+
+- **Cross-platform**: Same code works on Windows, Linux, and macOS
+- **Low latency**: Optimized for real-time audio processing
+- **Professional routing**: Connect any audio application to any other
+- **Sample-accurate**: Precise synchronization between applications
+- **Active community**: Well-supported and widely used in audio production
+
+Learn more: https://jackaudio.org/
+
 ## References
 
 - [Windows Driver Kit Documentation](https://docs.microsoft.com/en-us/windows-hardware/drivers/)
 - [Audio Device Driver Reference](https://docs.microsoft.com/en-us/windows-hardware/drivers/audio/)
 - [WASAPI Documentation](https://docs.microsoft.com/en-us/windows/win32/coreaudio/wasapi)
 - [AVStream Minidriver Development](https://docs.microsoft.com/en-us/windows-hardware/drivers/stream/avstream-overview)
+- [JACK Audio Connection Kit](https://jackaudio.org/)
