@@ -1,0 +1,2 @@
+/usr/bin/ar qc libvcard_common.a CMakeFiles/vcard_common.dir/vcard_common.c.o CMakeFiles/vcard_common.dir/sine_generator.c.o
+/usr/bin/ranlib libvcard_common.a

@@ -1,0 +1,1 @@
+/home/runner/work/virtual-sound-card/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/test_api_init.dir/link.d CMakeFiles/test_api_init.dir/test_api_init.c.o -o test_api_init  ../common/libvcard_common.a -lm
