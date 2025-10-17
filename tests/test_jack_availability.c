@@ -16,10 +16,12 @@ int main(void)
 	printf("Testing JACK2 library availability...\n");
 	
 	/* Test that we can call JACK API functions */
-	printf("  JACK library version: %d.%d.%d\n",
-	       jack_get_version_major(),
-	       jack_get_version_minor(),
-	       jack_get_version_micro());
+	const char *version = jack_get_version_string();
+	if (version != NULL) {
+		printf("  JACK library version: %s\n", version);
+	} else {
+		printf("  JACK library is available (version info not available)\n");
+	}
 	
 	/* Note: We don't try to connect to a JACK server here */
 	/* as that would require a running server */
