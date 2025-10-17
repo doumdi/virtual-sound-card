@@ -32,6 +32,9 @@ cmake -DBUILD_TESTS=ON ..
 cmake -DBUILD_LINUX=ON ..
 cmake -DBUILD_WINDOWS=ON ..
 cmake -DBUILD_MACOS=ON ..
+
+# Build with JACK2 support (cross-platform)
+cmake -DBUILD_JACK=ON ..
 ```
 
 ## Build Output
@@ -41,6 +44,12 @@ The build produces:
 - `tests/test_sine_generator` - Sine wave generator tests
 - `tests/test_api_init` - API initialization tests
 - `tests/test_sine_wave_file` - WAV file generation test
+
+### JACK2 Output
+
+When building with JACK2 support (`-DBUILD_JACK=ON`):
+- `jack_sine_generator` - Cross-platform JACK sine wave generator
+- `tests/test_jack_connection` - JACK API connection test
 
 ### Linux-Specific Output
 
@@ -76,9 +85,28 @@ ctest --output-on-failure --verbose
 # Run specific test
 ./tests/test_sine_generator
 
+# Test JACK connection (if built with JACK support)
+./tests/test_jack_connection
+
 # Play generated test audio (Linux/macOS)
 aplay tests/test_sine_440hz.wav  # Linux
 afplay tests/test_sine_440hz.wav  # macOS
+```
+
+### JACK2 Testing
+
+```bash
+# Ensure JACK server is running
+jackd -d alsa      # Linux
+jackd -d coreaudio # macOS  
+jackd -d portaudio # Windows
+
+# Run JACK demo
+../jack_demo.sh      # Linux/macOS
+..\jack_demo.bat     # Windows
+
+# Or run generator manually
+./jack_sine_generator 440 10
 ```
 
 ### Windows Testing

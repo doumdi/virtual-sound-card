@@ -119,6 +119,42 @@ cmake --build .
 
 Now applications can read sine wave audio from "BlackHole 2ch" as an input device.
 
+### JACK Audio Connection Kit (Cross-Platform)
+
+JACK2 provides professional, low-latency audio routing across all platforms.
+
+**Technology Stack:**
+- JACK Audio Connection Kit 2
+- Cross-platform (Linux, macOS, Windows)
+- Low-latency real-time audio
+
+**Quick Start:**
+```bash
+# Install JACK2
+# Linux: sudo apt-get install jackd2 libjack-jackd2-dev
+# macOS: brew install jack
+# Windows: Download from https://jackaudio.org/
+
+# Build with JACK support
+mkdir build && cd build
+cmake -DBUILD_JACK=ON ..
+cmake --build .
+
+# Start JACK server (if not already running)
+jackd -d alsa      # Linux
+jackd -d coreaudio # macOS
+jackd -d portaudio # Windows
+
+# Run JACK sine wave generator
+./jack_sine_generator 440 10
+
+# Or use the demo script
+../jack_demo.sh  # Linux/macOS
+..\jack_demo.bat # Windows
+```
+
+JACK provides professional audio routing and can be used alongside platform-specific solutions.
+
 ## Getting Started
 
 ### Prerequisites
@@ -126,6 +162,7 @@ Now applications can read sine wave audio from "BlackHole 2ch" as an input devic
 - **Linux**: GCC/Clang, ALSA libraries, kernel headers
 - **Windows**: Visual Studio, Windows SDK, WDK
 - **macOS**: Xcode, macOS SDK
+- **JACK2 (Optional)**: For cross-platform professional audio routing
 
 ### Building
 
@@ -138,9 +175,13 @@ The project uses **CMake** as the cross-platform build system.
 git clone https://github.com/doumdi/virtual-sound-card.git
 cd virtual-sound-card
 
-# Build
+# Build (automatically detects platform)
 mkdir build && cd build
 cmake ..
+cmake --build .
+
+# Build with JACK support
+cmake -DBUILD_JACK=ON ..
 cmake --build .
 
 # Run tests
@@ -156,6 +197,9 @@ ctest --output-on-failure
 - [Windows Implementation](windows/README.md)
 - [macOS Implementation](macos/README.md)
 
+**Cross-platform implementations:**
+- JACK2 Audio: Cross-platform professional audio routing (see demos: `jack_demo.sh` or `jack_demo.bat`)
+
 ## Features
 
 ### Implemented
@@ -164,6 +208,7 @@ ctest --output-on-failure
 - [x] **Test Suite**: Automated testing with CTest
 - [x] **Common API**: Cross-platform API definitions
 - [x] **macOS Virtual Device**: Virtual sine wave device using CoreAudio
+- [x] **JACK2 Support**: Cross-platform professional audio with JACK Audio Connection Kit
 
 ### Planned
 - [ ] Configurable number of input channels (1-32)
@@ -231,6 +276,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 - Linux ALSA loopback device integration
 - Windows WASAPI audio playback and capture
 - **macOS virtual sine wave device with loopback support**
+- **JACK2 cross-platform audio routing and generation**
 - Comprehensive test suite
 
 ### Next Steps

@@ -30,6 +30,16 @@ Generates a test WAV file containing a sine wave:
 
 This test is useful for manual verification of audio output. You can play the generated file to verify the sine wave generator works correctly.
 
+### test_jack_connection
+Tests JACK Audio Connection Kit integration (built only if JACK is available):
+- JACK library linking verification
+- JACK client connection (when server is running)
+- Sample rate retrieval
+- Buffer size retrieval
+- Client name verification
+
+Note: This test will skip connection tests if JACK server is not running, which is normal for CI environments.
+
 ## Running Tests
 
 ### Run All Tests
@@ -52,6 +62,9 @@ cd build/tests
 
 # Generate WAV file
 ./test_sine_wave_file
+
+# Test JACK connection (if built with JACK support)
+./test_jack_connection
 ```
 
 ### Verify Generated Audio
