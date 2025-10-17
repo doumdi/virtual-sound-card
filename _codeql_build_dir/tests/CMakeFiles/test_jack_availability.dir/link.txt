@@ -1,0 +1,1 @@
+/home/runner/work/virtual-sound-card/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/test_jack_availability.dir/link.d CMakeFiles/test_jack_availability.dir/test_jack_availability.c.o -o test_jack_availability  -ljack

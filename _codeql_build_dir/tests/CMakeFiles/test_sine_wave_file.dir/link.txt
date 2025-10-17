@@ -1,0 +1,1 @@
+/home/runner/work/virtual-sound-card/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/test_sine_wave_file.dir/link.d CMakeFiles/test_sine_wave_file.dir/test_sine_wave_file.c.o -o test_sine_wave_file  ../common/libvcard_common.a -lm

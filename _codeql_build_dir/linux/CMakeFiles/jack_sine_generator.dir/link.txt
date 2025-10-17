@@ -1,0 +1,1 @@
+/home/runner/work/virtual-sound-card/.codeql-scratch/dbs/cpp/working/autobuild/bin/cc -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/jack_sine_generator.dir/link.d CMakeFiles/jack_sine_generator.dir/userspace/jack_sine_generator.c.o -o jack_sine_generator  -ljack -lm
