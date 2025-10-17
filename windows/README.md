@@ -34,10 +34,9 @@ Similar to Linux's ALSA loopback (`snd-aloop`) and macOS's BlackHole, Windows ha
 
 4. **JACK Audio Connection Kit (Free, Cross-Platform)** - [Download](https://jackaudio.org/)
    - Professional audio server for low-latency routing
-   - Cross-platform solution (Linux, macOS, Windows)
-   - Advanced MIDI and audio routing
+   - Works across all platforms (Linux, macOS, Windows)
+   - Advanced MIDI and audio routing capabilities
    - Best for complex audio setups and professional use
-   - **Recommended for cross-platform development**
 
 These solutions provide the same core functionality as BlackHole on macOS and ALSA loopback on Linux, allowing applications to route audio between each other through virtual devices.
 

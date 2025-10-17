@@ -271,9 +271,11 @@ sudo pacman -S jack2 qjackctl
 
 ```bash
 # Start JACK server
+# Note: May need to specify device and buffer settings
+# Example: jackd -d alsa -d hw:0 -r 48000 -p 1024
 jackd -d alsa
 
-# Or use QjackCtl GUI
+# Or use QjackCtl GUI (recommended for easier configuration)
 qjackctl
 
 # Build with JACK support
