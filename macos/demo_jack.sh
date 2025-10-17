@@ -16,24 +16,25 @@ echo -e "${BLUE}macOS Virtual Sound Card - JACK2 Demo${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 
-# Check if JACK program exists
-if [ ! -f "build/jack_sine_generator" ] && [ ! -f "../build/macos/jack_sine_generator" ]; then
+# Check if JACK program exists - try multiple possible locations
+JACK_BIN=""
+if [ -f "../build/macos/jack_sine_generator" ]; then
+    JACK_BIN="../build/macos/jack_sine_generator"
+elif [ -f "build/jack_sine_generator" ]; then
+    JACK_BIN="build/jack_sine_generator"
+elif [ -f "../build/jack_sine_generator" ]; then
+    JACK_BIN="../build/jack_sine_generator"
+elif [ -f "jack_sine_generator" ]; then
+    JACK_BIN="jack_sine_generator"
+fi
+
+if [ -z "$JACK_BIN" ]; then
     echo -e "${RED}Error: jack_sine_generator not built.${NC}"
     echo "Build the project with JACK2 support:"
     echo "  brew install jack pkg-config"
     echo "  mkdir build && cd build"
     echo "  cmake -DBUILD_MACOS=ON .."
     echo "  cmake --build ."
-    exit 1
-fi
-
-# Find the binary
-if [ -f "../build/macos/jack_sine_generator" ]; then
-    JACK_BIN="../build/macos/jack_sine_generator"
-elif [ -f "build/jack_sine_generator" ]; then
-    JACK_BIN="build/jack_sine_generator"
-else
-    echo -e "${RED}Error: Could not find jack_sine_generator binary${NC}"
     exit 1
 fi
 

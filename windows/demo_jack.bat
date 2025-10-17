@@ -9,21 +9,27 @@ echo Windows Virtual Sound Card - JACK2 Demo
 echo ========================================
 echo.
 
-REM Check if JACK program exists
-if not exist "build\Release\jack_sine_generator.exe" (
-    if not exist "..\build\windows\Release\jack_sine_generator.exe" (
-        echo [ERROR] jack_sine_generator.exe not built.
-        echo.
-        echo Build the project with JACK2 support:
-        echo   1. Install JACK2 from https://jackaudio.org/
-        echo   2. mkdir build ^&^& cd build
-        echo   3. cmake -DBUILD_WINDOWS=ON ..
-        echo   4. cmake --build . --config Release
-        exit /b 1
-    )
-    set JACK_BIN=..\build\windows\Release\jack_sine_generator.exe
-) else (
+REM Check if JACK program exists - try multiple possible locations
+set JACK_BIN=
+if exist "..\build\windows\jack_sine_generator.exe" (
+    set JACK_BIN=..\build\windows\jack_sine_generator.exe
+) else if exist "build\Release\jack_sine_generator.exe" (
     set JACK_BIN=build\Release\jack_sine_generator.exe
+) else if exist "..\build\jack_sine_generator.exe" (
+    set JACK_BIN=..\build\jack_sine_generator.exe
+) else if exist "jack_sine_generator.exe" (
+    set JACK_BIN=jack_sine_generator.exe
+)
+
+if "%JACK_BIN%"=="" (
+    echo [ERROR] jack_sine_generator.exe not built.
+    echo.
+    echo Build the project with JACK2 support:
+    echo   1. Install JACK2 from https://jackaudio.org/
+    echo   2. mkdir build ^&^& cd build
+    echo   3. cmake -DBUILD_WINDOWS=ON ..
+    echo   4. cmake --build . --config Release
+    exit /b 1
 )
 
 echo [OK] Found JACK2 sine generator: !JACK_BIN!
@@ -50,9 +56,15 @@ if errorlevel 1 (
 echo [OK] JACK server is running
 echo.
 
-REM Show available JACK ports
+REM Show available JACK ports (first 9 lines)
 echo Available JACK ports:
-jack_lsp 2>nul | findstr /n "^" | findstr /b "[1-9]:" | findstr /v "[1][0-9]:"
+set COUNT=0
+for /f "delims=" %%i in ('jack_lsp 2^>nul') do (
+    echo %%i
+    set /a COUNT+=1
+    if !COUNT! GEQ 9 goto :done_ports
+)
+:done_ports
 echo.
 
 REM Demo parameters
