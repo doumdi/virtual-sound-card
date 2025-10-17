@@ -25,6 +25,27 @@ if(WIN32)
     message(STATUS "")
     message(STATUS "Note: For virtual loopback, install a virtual audio cable driver")
     message(STATUS "      (e.g., VB-Cable from https://vb-audio.com/Cable/)")
+    
+    # Find JACK2 library (optional)
+    find_path(JACK_INCLUDE_DIR jack/jack.h)
+    find_library(JACK_LIBRARY NAMES libjack64 libjack jack)
+    
+    if(JACK_INCLUDE_DIR AND JACK_LIBRARY)
+        message(STATUS "JACK2 found on Windows")
+        
+        # JACK2 sine wave generator
+        add_executable(jack_sine_generator userspace/jack_sine_generator.c)
+        target_include_directories(jack_sine_generator PRIVATE ${JACK_INCLUDE_DIR})
+        target_link_libraries(jack_sine_generator ${JACK_LIBRARY})
+        
+        message(STATUS "Windows JACK2 programs configured")
+        message(STATUS "  - jack_sine_generator: Generates sine wave via JACK2")
+        message(STATUS "")
+        message(STATUS "To use: Install JACK2 from https://jackaudio.org/")
+    else()
+        message(STATUS "JACK2 not found - JACK programs will not be built")
+        message(STATUS "Install JACK2 from https://jackaudio.org/ (optional)")
+    endif()
 else()
     message(STATUS "Not building on Windows - creating stub programs")
     

@@ -38,7 +38,34 @@ Each platform has different approaches to creating virtual audio devices for loo
 | **Windows** | VB-Cable | Kernel driver | Third-party virtual audio cable (free) |
 | **Windows** | Voicemeeter | Application + driver | Virtual mixer with audio cables (free) |
 | **Windows** | Virtual Audio Cable | Kernel driver | Professional multi-cable solution (commercial) |
-| **All** | JACK Audio | Audio server | Professional audio routing server (free, cross-platform) |
+| **All** | **JACK2 Audio** | **Audio server** | **Professional audio routing server (free, cross-platform, recommended)** |
+
+### JACK2 Audio Connection Kit
+
+**JACK2** (JACK Audio Connection Kit) is a professional, low-latency audio server that provides:
+- **Cross-platform support**: Linux, Windows, and macOS
+- **Virtual audio routing**: Connect audio between applications
+- **Low latency**: Real-time audio processing
+- **Flexible routing**: GUI and command-line tools for managing connections
+- **Active development**: Modern implementation with broad hardware support
+
+**Installation:**
+- **Linux**: `sudo apt-get install jackd2 libjack-jackd2-dev` (Ubuntu/Debian)
+- **macOS**: `brew install jack`
+- **Windows**: Download from [jackaudio.org](https://jackaudio.org/)
+
+**Quick Start with JACK2:**
+```bash
+# Start JACK server (Linux/macOS)
+jackd -d alsa  # Linux
+jackd -d coreaudio  # macOS
+
+# Or use QjackCtl GUI (recommended for beginners)
+qjackctl
+
+# Run JACK sine generator example
+./jack_sine_generator 440 5
+```
 
 ### Linux
 The Linux implementation uses ALSA (Advanced Linux Sound Architecture) or PulseAudio for creating virtual audio devices.
@@ -63,23 +90,33 @@ The Windows implementation uses Windows Driver Model (WDM) or WASAPI (Windows Au
 
 **Virtual Audio Cable Solutions:**
 Similar to Linux's ALSA loopback and macOS's BlackHole, Windows has several third-party virtual audio cable solutions:
+- **JACK2 Audio (Free, Recommended)** - Professional cross-platform audio routing server
 - VB-Cable (Free) - Basic virtual audio routing
 - Voicemeeter (Free) - Advanced virtual audio mixer
 - Virtual Audio Cable (Commercial) - Professional multi-cable solution
-- JACK Audio (Free) - Professional audio routing server
 
 **Requirements:**
 - Windows 10/11 SDK
 - Visual Studio 2019 or later
 - Windows Driver Kit (WDK)
 
-**Quick Start:**
+**Quick Start with JACK2 (Recommended):**
 ```bash
-# Build virtual sound card userspace tools
+# Install JACK2 for Windows from https://jackaudio.org/
+# Start QjackCtl (JACK control GUI)
+
+# Build virtual sound card with JACK2 support
 mkdir build && cd build
 cmake -DBUILD_WINDOWS=ON ..
 cmake --build .
 
+# Run JACK sine wave generator
+cd windows/Release
+jack_sine_generator.exe 440 5
+```
+
+**Alternative: VB-Cable:**
+```bash
 # Install a virtual audio cable (e.g., VB-Cable)
 # Download from: https://vb-audio.com/Cable/
 
@@ -88,7 +125,7 @@ cd windows/Release
 virtual_sine_device.exe -d "CABLE Input" -f 440
 ```
 
-Audio can be routed between applications using the virtual audio cable devices.
+Audio can be routed between applications using JACK2 or virtual audio cable devices.
 
 The `virtual_sine_device.exe` program is the Windows equivalent of the macOS `virtual_sine_device` program, providing continuous sine wave generation to any audio device (including VB-Cable).
 
@@ -105,7 +142,22 @@ The macOS implementation uses CoreAudio framework for creating virtual audio dev
 - macOS SDK
 - BlackHole or similar virtual audio driver (for loopback)
 
-**Quick Start:**
+**Quick Start with JACK2 (Recommended):**
+```bash
+# Install JACK2
+brew install jack
+
+# Start JACK server (or use QjackCtl GUI)
+jackd -d coreaudio
+
+# Build and run JACK sine generator
+mkdir build && cd build
+cmake -DBUILD_MACOS=ON ..
+cmake --build .
+./macos/jack_sine_generator 440 5
+```
+
+**Alternative: BlackHole:**
 ```bash
 # Install BlackHole virtual audio driver
 brew install blackhole-2ch
@@ -117,7 +169,7 @@ cmake --build .
 ./macos/virtual_sine_device -d "BlackHole 2ch" -f 440
 ```
 
-Now applications can read sine wave audio from "BlackHole 2ch" as an input device.
+Now applications can read sine wave audio from JACK2 or "BlackHole 2ch" as an input device.
 
 ## Getting Started
 
@@ -164,6 +216,7 @@ ctest --output-on-failure
 - [x] **Test Suite**: Automated testing with CTest
 - [x] **Common API**: Cross-platform API definitions
 - [x] **macOS Virtual Device**: Virtual sine wave device using CoreAudio
+- [x] **JACK2 Support**: Cross-platform JACK2 audio server integration on Linux, Windows, and macOS
 
 ### Planned
 - [ ] Configurable number of input channels (1-32)
@@ -231,6 +284,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 - Linux ALSA loopback device integration
 - Windows WASAPI audio playback and capture
 - **macOS virtual sine wave device with loopback support**
+- **JACK2 audio server integration on all platforms (Linux, Windows, macOS)**
 - Comprehensive test suite
 
 ### Next Steps

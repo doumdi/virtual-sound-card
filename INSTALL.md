@@ -96,15 +96,15 @@ Available options:
 #### Prerequisites
 
 ```bash
-# Ubuntu/Debian - Install ALSA development libraries
+# Ubuntu/Debian - Install ALSA and JACK2 development libraries
 sudo apt-get update
-sudo apt-get install build-essential cmake git libasound2-dev alsa-utils
+sudo apt-get install build-essential cmake git libasound2-dev alsa-utils libjack-jackd2-dev pkg-config
 
 # Fedora/RHEL
-sudo dnf install cmake gcc gcc-c++ git alsa-lib-devel alsa-utils
+sudo dnf install cmake gcc gcc-c++ git alsa-lib-devel alsa-utils jack-audio-connection-kit-devel
 
 # Arch Linux
-sudo pacman -S base-devel cmake git alsa-lib alsa-utils
+sudo pacman -S base-devel cmake git alsa-lib alsa-utils jack2
 ```
 
 #### Building
@@ -118,7 +118,8 @@ cmake --build .
 
 The Linux build creates:
 - `libvcard_common.a` - Common library
-- `sine_generator_app` - Sine wave generator for testing
+- `sine_generator_app` - Sine wave generator for testing (ALSA)
+- `jack_sine_generator` - Sine wave generator using JACK2 (if JACK2 is installed)
 - `test_loopback_read` - Audio verification test
 
 #### Installation
@@ -134,6 +135,7 @@ sudo make install
 
 #### Setup and Verification
 
+**Option 1: Using ALSA loopback (built-in)**
 ```bash
 # Load the ALSA loopback kernel module
 sudo modprobe snd-aloop
@@ -146,6 +148,18 @@ sine_generator_app 440 5
 
 # In another terminal, verify the audio
 test_loopback_read
+```
+
+**Option 2: Using JACK2 (recommended for low latency)**
+```bash
+# Start JACK server
+jackd -d alsa &
+
+# Or use QjackCtl GUI
+qjackctl &
+
+# Test the JACK sine wave generator
+jack_sine_generator 440 5
 ```
 
 For detailed Linux usage, see [linux/README.md](linux/README.md).
@@ -207,11 +221,22 @@ Choose one of these Windows virtual audio cable solutions:
    - Download from: https://vac.muzychenko.net/en/
    - Professional solution with multiple cables
 
-4. **JACK Audio (Free, Professional)**
+4. **JACK2 Audio (Free, Professional, Recommended)**
    - Download from: https://jackaudio.org/
-   - Cross-platform audio routing server
+   - Cross-platform audio routing server with low latency
+   - **Now supported by this project on all platforms!**
 
-**Testing:**
+**Testing with JACK2 (Recommended):**
+```cmd
+# Install and start JACK2
+# Download from: https://jackaudio.org/
+# Start QjackCtl
+
+# Test JACK sine wave generator
+jack_sine_generator.exe 440 5
+```
+
+**Testing with WASAPI:**
 ```cmd
 # Generate a 440Hz sine wave (default device)
 sine_generator_app.exe 440 10
@@ -225,6 +250,16 @@ sine_generator_app.exe 440 10
 For detailed Windows usage, see [windows/QUICKSTART.md](windows/QUICKSTART.md).
 
 ### macOS
+
+#### Prerequisites
+
+```bash
+# Install JACK2 (recommended)
+brew install jack
+
+# Install pkg-config (required for JACK2 detection)
+brew install pkg-config
+```
 
 #### Building
 
@@ -247,6 +282,29 @@ sudo cmake --install .
 
 # Install to user location
 cmake --install . --prefix ~/local
+```
+
+#### Testing with JACK2 (Recommended)
+
+```bash
+# Start JACK server
+jackd -d coreaudio &
+
+# Or use QjackCtl GUI
+qjackctl &
+
+# Test JACK sine wave generator
+./macos/jack_sine_generator 440 5
+```
+
+#### Testing with BlackHole
+
+```bash
+# Install BlackHole
+brew install blackhole-2ch
+
+# Test virtual sine device
+./macos/virtual_sine_device -d "BlackHole 2ch" -f 440
 ```
 
 ## Testing
@@ -400,16 +458,17 @@ For audio loopback functionality (routing audio between applications), each plat
 
 | Platform | Built-in Solution | Third-Party Solutions | Recommendation |
 |----------|------------------|----------------------|----------------|
-| **Linux** | `snd-aloop` (ALSA loopback kernel module) | JACK Audio, PipeWire | Use built-in `snd-aloop` |
-| **macOS** | None | BlackHole, Soundflower, JACK Audio | BlackHole (free, recommended) |
-| **Windows** | None | VB-Cable, Voicemeeter, Virtual Audio Cable, JACK Audio | VB-Cable (free, recommended) |
+| **Linux** | `snd-aloop` (ALSA loopback kernel module) | **JACK2** (recommended), PipeWire | **JACK2** for low latency, `snd-aloop` for simplicity |
+| **macOS** | None | **JACK2** (recommended), BlackHole, Soundflower | **JACK2** for professional use, BlackHole for simplicity |
+| **Windows** | None | **JACK2** (recommended), VB-Cable, Voicemeeter, Virtual Audio Cable | **JACK2** for cross-platform compatibility |
 
 **Usage Pattern:**
-- **Linux**: `modprobe snd-aloop` creates loopback devices automatically
-- **macOS**: Install BlackHole, then use "BlackHole 2ch" as audio device
-- **Windows**: Install VB-Cable, then use "CABLE Input" (playback) and "CABLE Output" (recording)
+- **JACK2 (All platforms)**: Start JACK server (`jackd` or QjackCtl), applications connect via JACK ports
+- **Linux (ALSA)**: `modprobe snd-aloop` creates loopback devices automatically
+- **macOS (BlackHole)**: Install BlackHole, then use "BlackHole 2ch" as audio device
+- **Windows (VB-Cable)**: Install VB-Cable, then use "CABLE Input" (playback) and "CABLE Output" (recording)
 
-All three solutions allow applications to route audio through virtual devices without physical audio cables.
+All solutions allow applications to route audio through virtual devices without physical audio cables. **JACK2 is recommended for professional audio work and cross-platform compatibility.**
 
 ## Support
 

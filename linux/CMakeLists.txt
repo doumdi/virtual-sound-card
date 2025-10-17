@@ -30,3 +30,28 @@ else()
     message(WARNING "  Ubuntu/Debian: sudo apt-get install libasound2-dev")
     message(WARNING "  Fedora/RHEL: sudo dnf install alsa-lib-devel")
 endif()
+
+# Find JACK2 library
+find_package(PkgConfig)
+if(PkgConfig_FOUND)
+    pkg_check_modules(JACK jack)
+    if(JACK_FOUND)
+        message(STATUS "JACK2 found: ${JACK_VERSION}")
+        
+        # JACK2 sine wave generator
+        add_executable(jack_sine_generator userspace/jack_sine_generator.c)
+        target_link_libraries(jack_sine_generator ${JACK_LIBRARIES} m)
+        target_include_directories(jack_sine_generator PRIVATE ${JACK_INCLUDE_DIRS})
+        target_compile_options(jack_sine_generator PRIVATE ${JACK_CFLAGS_OTHER})
+        
+        message(STATUS "Linux JACK2 programs configured")
+        message(STATUS "  - jack_sine_generator: Generates sine wave via JACK2")
+        message(STATUS "")
+        message(STATUS "To use: Start JACK server (jackd or pipewire-jack)")
+    else()
+        message(STATUS "JACK2 not found - JACK programs will not be built")
+        message(STATUS "Install JACK development libraries (optional):")
+        message(STATUS "  Ubuntu/Debian: sudo apt-get install libjack-jackd2-dev")
+        message(STATUS "  Fedora/RHEL: sudo dnf install jack-audio-connection-kit-devel")
+    endif()
+endif()
