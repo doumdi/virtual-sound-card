@@ -275,7 +275,7 @@ sudo pacman -S jack2 qjackctl
 # Example: jackd -d alsa -d hw:0 -r 48000 -p 1024
 jackd -d alsa
 
-# Or use QjackCtl GUI (recommended for easier configuration)
+# Or use QjackCtl GUI for easier configuration
 qjackctl
 
 # Build with JACK support

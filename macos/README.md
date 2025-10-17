@@ -295,10 +295,9 @@ cmake --build .
 
 # Start JACK server
 # Note: This may temporarily take over system audio
-# Use QjackCtl GUI for easier configuration
 jackd -d coreaudio
 
-# Or use QjackCtl GUI (recommended)
+# Or use QjackCtl GUI for easier configuration
 qjackctl
 
 # Run JACK sine wave generator
