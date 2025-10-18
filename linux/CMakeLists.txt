@@ -40,8 +40,9 @@ if(PkgConfig_FOUND)
         
         # JACK2 sine wave generator
         add_executable(jack_sine_generator userspace/jack_sine_generator.c)
-        target_link_libraries(jack_sine_generator ${JACK_LIBRARIES} m)
         target_include_directories(jack_sine_generator PRIVATE ${JACK_INCLUDE_DIRS})
+        target_link_directories(jack_sine_generator PRIVATE ${JACK_LIBRARY_DIRS})
+        target_link_libraries(jack_sine_generator ${JACK_LIBRARIES} m)
         target_compile_options(jack_sine_generator PRIVATE ${JACK_CFLAGS_OTHER})
         
         message(STATUS "Linux JACK2 programs configured")

@@ -48,11 +48,15 @@ if(APPLE)
         pkg_check_modules(JACK jack)
         if(JACK_FOUND)
             message(STATUS "JACK2 found: ${JACK_VERSION}")
+            message(STATUS "JACK include dirs: ${JACK_INCLUDE_DIRS}")
+            message(STATUS "JACK library dirs: ${JACK_LIBRARY_DIRS}")
+            message(STATUS "JACK libraries: ${JACK_LIBRARIES}")
             
             # JACK2 sine wave generator
             add_executable(jack_sine_generator userspace/jack_sine_generator.c)
-            target_link_libraries(jack_sine_generator ${JACK_LIBRARIES})
             target_include_directories(jack_sine_generator PRIVATE ${JACK_INCLUDE_DIRS})
+            target_link_directories(jack_sine_generator PRIVATE ${JACK_LIBRARY_DIRS})
+            target_link_libraries(jack_sine_generator ${JACK_LIBRARIES})
             target_compile_options(jack_sine_generator PRIVATE ${JACK_CFLAGS_OTHER})
             
             message(STATUS "macOS JACK2 programs configured")
