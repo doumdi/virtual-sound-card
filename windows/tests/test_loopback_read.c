@@ -22,6 +22,10 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#ifndef WAVE_FORMAT_EXTENSIBLE
+#define WAVE_FORMAT_EXTENSIBLE 0xFFFE
+#endif
+
 #define READ_DURATION 2
 #define EXPECTED_FREQUENCY 440.0
 #define FREQUENCY_TOLERANCE 5.0
@@ -31,6 +35,36 @@ const CLSID CLSID_MMDeviceEnumerator = {0xBCDE0395, 0xE52F, 0x467C, {0x8E, 0x3D,
 const IID IID_IMMDeviceEnumerator = {0xA95664D2, 0x9614, 0x4F35, {0xA7, 0x46, 0xDE, 0x8D, 0xB6, 0x36, 0x17, 0xE6}};
 const IID IID_IAudioClient = {0x1CB9AD4C, 0xDBFA, 0x4C32, {0xB1, 0x78, 0xC2, 0xF5, 0x68, 0xA7, 0x03, 0xB2}};
 const IID IID_IAudioCaptureClient = {0xC8ADBD64, 0xE71E, 0x48a0, {0xA4, 0xDE, 0x18, 0x5C, 0x39, 0x5C, 0xD3, 0x17}};
+
+/* Audio format GUIDs for WAVEFORMATEXTENSIBLE */
+static const GUID KSDATAFORMAT_SUBTYPE_IEEE_FLOAT = {
+    0x00000003, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}
+};
+
+/**
+ * Helper function to compare GUIDs
+ */
+static int guid_equals(const GUID *a, const GUID *b)
+{
+    return memcmp(a, b, sizeof(GUID)) == 0;
+}
+
+/**
+ * Check if format is IEEE float (supports both simple and extensible formats)
+ */
+static int is_format_ieee_float(WAVEFORMATEX *pwfx)
+{
+    if (pwfx->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
+        return 1;
+    }
+    
+    if (pwfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
+        WAVEFORMATEXTENSIBLE *pwfex = (WAVEFORMATEXTENSIBLE*)pwfx;
+        return guid_equals(&pwfex->SubFormat, &KSDATAFORMAT_SUBTYPE_IEEE_FLOAT);
+    }
+    
+    return 0;
+}
 
 /**
  * Simple zero-crossing frequency detector
@@ -262,7 +296,7 @@ int main(void)
 			}
 
 			/* Extract mono samples (left channel only) */
-			if (pwfx->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
+			if (is_format_ieee_float(pwfx)) {
 				float *floatData = (float*)pData;
 				for (UINT32 i = 0; i < numFramesToRead && samples_collected < samples_capacity; i++) {
 					all_samples[samples_collected++] = floatData[i * pwfx->nChannels];
