@@ -36,6 +36,10 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#ifndef WAVE_FORMAT_EXTENSIBLE
+#define WAVE_FORMAT_EXTENSIBLE 0xFFFE
+#endif
+
 #define DEFAULT_FREQUENCY 440.0
 #define DEFAULT_SAMPLE_RATE 48000
 #define DEFAULT_CHANNELS 2
@@ -47,6 +51,14 @@ const IID IID_IMMDeviceEnumerator = {0xA95664D2, 0x9614, 0x4F35, {0xA7, 0x46, 0x
 const IID IID_IAudioClient = {0x1CB9AD4C, 0xDBFA, 0x4C32, {0xB1, 0x78, 0xC2, 0xF5, 0x68, 0xA7, 0x03, 0xB2}};
 const IID IID_IAudioRenderClient = {0xF294ACFC, 0x3146, 0x4483, {0xA7, 0xBF, 0xAD, 0xDC, 0xA7, 0xC2, 0x60, 0xE2}};
 
+/* Audio format GUIDs for WAVEFORMATEXTENSIBLE */
+static const GUID KSDATAFORMAT_SUBTYPE_IEEE_FLOAT = {
+    0x00000003, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}
+};
+static const GUID KSDATAFORMAT_SUBTYPE_PCM = {
+    0x00000001, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}
+};
+
 typedef struct {
     double phase;
     double frequency;
@@ -55,6 +67,77 @@ typedef struct {
 } sine_generator_t;
 
 static volatile int g_running = 1;
+
+/**
+ * Helper function to compare GUIDs
+ */
+static int guid_equals(const GUID *a, const GUID *b)
+{
+    return memcmp(a, b, sizeof(GUID)) == 0;
+}
+
+/**
+ * Check if format is IEEE float (supports both simple and extensible formats)
+ * Returns 1 if IEEE float, 0 otherwise
+ */
+static int is_format_ieee_float(WAVEFORMATEX *pwfx)
+{
+    if (pwfx->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
+        return 1;
+    }
+    
+    if (pwfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
+        WAVEFORMATEXTENSIBLE *pwfex = (WAVEFORMATEXTENSIBLE*)pwfx;
+        return guid_equals(&pwfex->SubFormat, &KSDATAFORMAT_SUBTYPE_IEEE_FLOAT);
+    }
+    
+    return 0;
+}
+
+/**
+ * Check if format is PCM (supports both simple and extensible formats)
+ * Returns 1 if PCM, 0 otherwise
+ */
+static int is_format_pcm(WAVEFORMATEX *pwfx)
+{
+    if (pwfx->wFormatTag == WAVE_FORMAT_PCM) {
+        return 1;
+    }
+    
+    if (pwfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
+        WAVEFORMATEXTENSIBLE *pwfex = (WAVEFORMATEXTENSIBLE*)pwfx;
+        return guid_equals(&pwfex->SubFormat, &KSDATAFORMAT_SUBTYPE_PCM);
+    }
+    
+    return 0;
+}
+
+/**
+ * Get format description string for display
+ */
+static const char* get_format_description(WAVEFORMATEX *pwfx)
+{
+    static char desc[128];
+    
+    if (pwfx->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
+        snprintf(desc, sizeof(desc), "IEEE Float (32-bit)");
+    } else if (pwfx->wFormatTag == WAVE_FORMAT_PCM) {
+        snprintf(desc, sizeof(desc), "PCM %d-bit", pwfx->wBitsPerSample);
+    } else if (pwfx->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
+        WAVEFORMATEXTENSIBLE *pwfex = (WAVEFORMATEXTENSIBLE*)pwfx;
+        if (guid_equals(&pwfex->SubFormat, &KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)) {
+            snprintf(desc, sizeof(desc), "EXTENSIBLE - IEEE Float (32-bit)");
+        } else if (guid_equals(&pwfex->SubFormat, &KSDATAFORMAT_SUBTYPE_PCM)) {
+            snprintf(desc, sizeof(desc), "EXTENSIBLE - PCM %d-bit", pwfx->wBitsPerSample);
+        } else {
+            snprintf(desc, sizeof(desc), "EXTENSIBLE - Unknown SubFormat");
+        }
+    } else {
+        snprintf(desc, sizeof(desc), "Unknown (0x%x)", pwfx->wFormatTag);
+    }
+    
+    return desc;
+}
 
 static void sine_generator_init(sine_generator_t *gen, double frequency,
                                 double sample_rate, double amplitude)
@@ -76,6 +159,52 @@ static void sine_generator_process_float(sine_generator_t *gen, float *buffer,
         /* Write to all channels */
         for (int ch = 0; ch < channels; ch++) {
             buffer[i * channels + ch] = sample;
+        }
+        
+        gen->phase += phase_increment;
+        if (gen->phase >= 2.0 * M_PI) {
+            gen->phase -= 2.0 * M_PI;
+        }
+    }
+}
+
+/**
+ * Process sine wave into PCM format
+ * Supports 16-bit, 24-bit, and 32-bit PCM
+ */
+static void sine_generator_process_pcm(sine_generator_t *gen, BYTE *buffer,
+                                       size_t num_samples, int channels,
+                                       int bits_per_sample)
+{
+    double phase_increment = 2.0 * M_PI * gen->frequency / gen->sample_rate;
+    int bytes_per_sample = bits_per_sample / 8;
+    
+    for (size_t i = 0; i < num_samples; i++) {
+        double sample_value = gen->amplitude * sin(gen->phase);
+        
+        /* Write to all channels */
+        for (int ch = 0; ch < channels; ch++) {
+            BYTE *sample_ptr = buffer + (i * channels + ch) * bytes_per_sample;
+            
+            if (bits_per_sample == 16) {
+                /* 16-bit signed PCM: range -32768 to 32767 */
+                int16_t pcm_sample = (int16_t)(sample_value * 32767.0);
+                memcpy(sample_ptr, &pcm_sample, sizeof(int16_t));
+            } else if (bits_per_sample == 24) {
+                /* 24-bit signed PCM: range -8388608 to 8388607 */
+                int32_t pcm_sample = (int32_t)(sample_value * 8388607.0);
+                /* Write 3 bytes (little-endian) */
+                sample_ptr[0] = (BYTE)(pcm_sample & 0xFF);
+                sample_ptr[1] = (BYTE)((pcm_sample >> 8) & 0xFF);
+                sample_ptr[2] = (BYTE)((pcm_sample >> 16) & 0xFF);
+            } else if (bits_per_sample == 32) {
+                /* 32-bit signed PCM: range -2147483648 to 2147483647 */
+                int32_t pcm_sample = (int32_t)(sample_value * 2147483647.0);
+                memcpy(sample_ptr, &pcm_sample, sizeof(int32_t));
+            } else {
+                /* Unsupported bit depth - write silence */
+                memset(sample_ptr, 0, bytes_per_sample);
+            }
         }
         
         gen->phase += phase_increment;
@@ -362,14 +491,7 @@ int main(int argc, char *argv[])
     printf("Frequency: %.2f Hz\n", frequency);
     printf("Sample Rate: %ld Hz\n", pwfx->nSamplesPerSec);
     printf("Channels: %d\n", pwfx->nChannels);
-    printf("Format: ");
-    if (pwfx->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
-        printf("IEEE Float\n");
-    } else if (pwfx->wFormatTag == WAVE_FORMAT_PCM) {
-        printf("PCM %d-bit\n", pwfx->wBitsPerSample);
-    } else {
-        printf("Unknown (0x%x)\n", pwfx->wFormatTag);
-    }
+    printf("Format: %s\n", get_format_description(pwfx));
     printf("\n");
 
     /* Initialize audio client */
@@ -456,12 +578,17 @@ int main(int argc, char *argv[])
             }
 
             /* Generate audio */
-            if (pwfx->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
+            if (is_format_ieee_float(pwfx)) {
                 sine_generator_process_float(&gen, (float*)pData,
                                             numFramesAvailable,
                                             pwfx->nChannels);
+            } else if (is_format_pcm(pwfx)) {
+                sine_generator_process_pcm(&gen, pData,
+                                          numFramesAvailable,
+                                          pwfx->nChannels,
+                                          pwfx->wBitsPerSample);
             } else {
-                /* For PCM, we'd need to convert - for now just silence */
+                /* Unsupported format - write silence */
                 memset(pData, 0, numFramesAvailable * pwfx->nBlockAlign);
             }
 

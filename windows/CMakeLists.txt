@@ -18,10 +18,16 @@ if(WIN32)
     add_executable(test_loopback_read tests/test_loopback_read.c)
     target_link_libraries(test_loopback_read ole32 uuid)
     
+    # Format handling test
+    add_executable(test_format_handling tests/test_format_handling.c)
+    target_link_libraries(test_format_handling ole32 uuid)
+    add_test(NAME windows_test_format_handling COMMAND test_format_handling)
+    
     message(STATUS "Windows WASAPI programs configured")
     message(STATUS "  - sine_generator_app: Generates sine wave to default audio output")
     message(STATUS "  - virtual_sine_device: Continuous sine wave to specific device (e.g., VB-Cable)")
     message(STATUS "  - test_loopback_read: Reads and verifies audio from default capture device")
+    message(STATUS "  - test_format_handling: Tests format detection and conversion logic")
     message(STATUS "")
     message(STATUS "Note: For virtual loopback, install a virtual audio cable driver")
     message(STATUS "      (e.g., VB-Cable from https://vb-audio.com/Cable/)")
