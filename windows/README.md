@@ -12,33 +12,57 @@ Similar to Linux's ALSA loopback (`snd-aloop`) and macOS's BlackHole, Windows ha
 
 #### Recommended Solutions
 
-1. **VB-Cable (Free)** - [Download](https://vb-audio.com/Cable/)
+1. **JACK2 Audio Connection Kit (Free, Recommended)** - [Download](https://jackaudio.org/)
+   - **Professional audio server for low-latency routing**
+   - **Cross-platform solution (works on Linux, Windows, macOS)**
+   - **Now supported by this project with native examples!**
+   - Advanced MIDI and audio routing
+   - QjackCtl GUI for connection management
+   - Best for professional audio work and cross-platform compatibility
+
+2. **VB-Cable (Free)** - [Download](https://vb-audio.com/Cable/)
    - Free virtual audio device driver
    - Creates one pair of virtual input/output devices
    - Low latency and stable
    - Best for basic virtual audio routing
 
-2. **Voicemeeter (Free)** - [Download](https://vb-audio.com/Voicemeeter/)
+3. **Voicemeeter (Free)** - [Download](https://vb-audio.com/Voicemeeter/)
    - Advanced virtual audio mixer with virtual I/O
    - Includes virtual audio cable functionality
    - Multiple virtual devices
    - GUI for audio routing and mixing
 
-3. **Virtual Audio Cable (Commercial)** - [Download](https://vac.muzychenko.net/en/)
+4. **Virtual Audio Cable (Commercial)** - [Download](https://vac.muzychenko.net/en/)
    - Professional virtual audio cable driver
    - Multiple virtual cables (up to 256)
    - Low latency, high quality
    - Advanced configuration options
 
-4. **JACK Audio Connection Kit** - [Download](https://jackaudio.org/)
-   - Professional audio server for low-latency routing
-   - Cross-platform solution
-   - Advanced MIDI and audio routing
-   - Best for complex audio setups
+These solutions provide the same core functionality as BlackHole on macOS and ALSA loopback on Linux, allowing applications to route audio between each other through virtual devices. **JACK2 is now the recommended solution and has full support in this project.**
 
-These solutions provide the same core functionality as BlackHole on macOS and ALSA loopback on Linux, allowing applications to route audio between each other through virtual devices.
+## Quick Example with JACK2 (Recommended)
 
-## Quick Example with VB-Cable
+The `jack_sine_generator` program demonstrates JACK2 audio on Windows:
+
+```cmd
+# 1. Install JACK2 from https://jackaudio.org/
+
+# 2. Start QjackCtl (JACK Control GUI)
+
+# 3. Build the project
+mkdir build && cd build
+cmake -DBUILD_WINDOWS=ON ..
+cmake --build . --config Release
+
+# 4. Generate sine wave via JACK2
+cd windows\Release
+jack_sine_generator.exe 440 5
+
+# JACK automatically routes audio to your system output
+# Use QjackCtl to manage connections between applications
+```
+
+## Quick Example with VB-Cable (Alternative)
 
 The `virtual_sine_device` program demonstrates virtual audio loopback on Windows:
 
@@ -58,9 +82,9 @@ virtual_sine_device.exe -d "CABLE Input" -f 440
 # The application will receive the 440Hz sine wave
 ```
 
-This is equivalent to:
-- **Linux**: `sine_generator_app` playing to `hw:Loopback,0,0`
-- **macOS**: `virtual_sine_device -d "BlackHole 2ch" -f 440`
+Cross-platform equivalents:
+- **Linux**: `jack_sine_generator 440 5` or `sine_generator_app` to `hw:Loopback,0,0`
+- **macOS**: `jack_sine_generator 440 5` or `virtual_sine_device -d "BlackHole 2ch" -f 440`
 
 ## Architecture
 

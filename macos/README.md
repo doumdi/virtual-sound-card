@@ -4,11 +4,41 @@ This directory contains the macOS implementation of the virtual sound card drive
 
 ## Overview
 
-The macOS driver creates a virtual audio device using CoreAudio framework. The device appears in System Preferences and can be used by any CoreAudio-compatible application.
+The macOS driver creates a virtual audio device using CoreAudio framework. The device appears in System Preferences and can be used by any CoreAudio-compatible application. Additionally, JACK2 support provides professional-grade, low-latency audio routing.
 
-### Quick Start: Virtual Sine Wave Device
+### Quick Start: Using JACK2 (Recommended)
 
-For immediate use, we provide a **virtual sine wave device** that generates a sine wave when applications read from it:
+For professional audio routing with low latency:
+
+1. Install JACK2:
+   ```bash
+   brew install jack
+   ```
+
+2. Build the project:
+   ```bash
+   mkdir build && cd build
+   cmake -DBUILD_MACOS=ON ..
+   cmake --build .
+   ```
+
+3. Start JACK server:
+   ```bash
+   jackd -d coreaudio &
+   # Or use QjackCtl GUI (recommended)
+   qjackctl &
+   ```
+
+4. Run the JACK sine generator:
+   ```bash
+   ./macos/jack_sine_generator 440 5
+   ```
+
+JACK automatically handles audio routing. Use QjackCtl to manage connections between applications.
+
+### Quick Start: Virtual Sine Wave Device (Alternative)
+
+For immediate use with BlackHole, we provide a **virtual sine wave device** that generates a sine wave when applications read from it:
 
 1. Install BlackHole (virtual audio driver):
    ```bash
@@ -48,6 +78,7 @@ The implementation consists of:
 - macOS SDK
 - Apple Developer account (for code signing)
 - Entitlements for DriverKit development
+- JACK2 (optional, for JACK support): `brew install jack`
 
 ### Installation
 
@@ -56,7 +87,11 @@ The implementation consists of:
    ```bash
    xcode-select --install
    ```
-3. Enroll in Apple Developer Program (required for driver signing)
+3. Install JACK2 (recommended):
+   ```bash
+   brew install jack pkg-config
+   ```
+4. Enroll in Apple Developer Program (required for driver signing)
 
 ## Building
 

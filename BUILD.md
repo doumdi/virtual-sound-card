@@ -41,18 +41,35 @@ The build produces:
 - `tests/test_sine_generator` - Sine wave generator tests
 - `tests/test_api_init` - API initialization tests
 - `tests/test_sine_wave_file` - WAV file generation test
+- `tests/test_jack_availability` - JACK2 library availability test
 
 ### Linux-Specific Output
 
 When building on Linux with ALSA support:
-- `linux/sine_generator_app` - Sine wave generator application
+- `linux/sine_generator_app` - Sine wave generator application (ALSA)
 - `linux/test_loopback_read` - Loopback device verification test
+
+When building on Linux with JACK2 support (recommended):
+- `linux/jack_sine_generator` - JACK2 sine wave generator application
 
 ### Windows-Specific Output
 
 When building on Windows with WASAPI support:
 - `windows/sine_generator_app.exe` - Sine wave generator application
 - `windows/test_loopback_read.exe` - Loopback device verification test
+
+When building on Windows with JACK2 support (recommended):
+- `windows/jack_sine_generator.exe` - JACK2 sine wave generator application
+
+### macOS-Specific Output
+
+When building on macOS with CoreAudio support:
+- `macos/sine_generator_app` - Sine wave generator application
+- `macos/virtual_sine_device` - Virtual sine wave device
+- `macos/test_loopback_read` - Loopback device verification test
+
+When building on macOS with JACK2 support (recommended):
+- `macos/jack_sine_generator` - JACK2 sine wave generator application
 
 ## Installation
 

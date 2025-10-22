@@ -8,11 +8,12 @@ This directory contains the Linux implementation of the virtual sound card drive
 
 ## Overview
 
-The Linux driver creates a virtual ALSA device that can be used by any application supporting ALSA or PulseAudio.
+The Linux driver creates a virtual ALSA device that can be used by any application supporting ALSA or PulseAudio. Additionally, JACK2 support provides professional-grade, low-latency audio routing.
 
 ## Architecture
 
 The implementation uses:
+- **JACK2 Audio Server** (recommended): Professional audio routing with low latency and flexible routing
 - **ALSA Loopback Module**: For basic audio routing
 - **Custom Kernel Module** (optional): For advanced features and lower latency
 - **User-space Control**: Configuration tools
@@ -22,14 +23,14 @@ The implementation uses:
 ### Build Dependencies
 
 ```bash
-# Debian/Ubuntu
-sudo apt-get install build-essential linux-headers-$(uname -r) alsa-utils libasound2-dev
+# Debian/Ubuntu (with JACK2 support - recommended)
+sudo apt-get install build-essential linux-headers-$(uname -r) alsa-utils libasound2-dev libjack-jackd2-dev pkg-config
 
-# Fedora/RHEL
-sudo dnf install kernel-devel alsa-lib-devel gcc make
+# Fedora/RHEL (with JACK2 support - recommended)
+sudo dnf install kernel-devel alsa-lib-devel gcc make jack-audio-connection-kit-devel
 
-# Arch Linux
-sudo pacman -S base-devel linux-headers alsa-utils alsa-lib
+# Arch Linux (with JACK2 support - recommended)
+sudo pacman -S base-devel linux-headers alsa-utils alsa-lib jack2
 ```
 
 ## Building
@@ -44,7 +45,8 @@ cmake --build .
 ```
 
 The Linux programs will be built in `build/linux/`:
-- `sine_generator_app` - Sine wave generator
+- `sine_generator_app` - Sine wave generator (ALSA)
+- `jack_sine_generator` - Sine wave generator (JACK2, if JACK is installed)
 - `test_loopback_read` - Audio verification test
 
 ### Using Makefile
@@ -55,8 +57,10 @@ make
 ```
 
 Programs will be built in `linux/build/`:
-- `sine_generator_app` - Sine wave generator
+- `sine_generator_app` - Sine wave generator (ALSA)
 - `test_loopback_read` - Audio verification test
+
+Note: JACK2 programs are only built via CMake when JACK2 development libraries are installed.
 
 ## Installation
 
@@ -69,7 +73,27 @@ This installs programs to `/usr/local/bin/`.
 
 ## Usage
 
-### Loading the Module
+### Option 1: Using JACK2 (Recommended for Low Latency)
+
+JACK2 provides professional audio routing with low latency and flexible connection management.
+
+```bash
+# Start JACK server
+jackd -d alsa &
+
+# Or use QjackCtl GUI (recommended)
+qjackctl &
+
+# Generate a 440Hz sine wave for 5 seconds (default)
+./build/linux/jack_sine_generator
+
+# Generate a 880Hz sine wave for 10 seconds
+./build/linux/jack_sine_generator 880 10
+```
+
+JACK automatically handles audio routing between applications. Use QjackCtl or `jack_connect` to route audio between programs.
+
+### Option 2: Using ALSA Loopback
 
 The Linux implementation uses the ALSA loopback module (`snd-aloop`) which provides a virtual sound card.
 
@@ -85,29 +109,29 @@ The module creates a loopback device with two subdevices:
 - `hw:Loopback,0,0` - Playback subdevice (write audio here)
 - `hw:Loopback,1,0` - Capture subdevice (read audio here)
 
-### Running the Sine Wave Generator
+### Running the Sine Wave Generator (ALSA)
 
 ```bash
 # Generate a 440Hz sine wave for 5 seconds (default)
-./build/sine_generator_app
+./build/linux/sine_generator_app
 
 # Generate a 880Hz sine wave for 10 seconds
-./build/sine_generator_app 880 10
+./build/linux/sine_generator_app 880 10
 
 # Or if installed:
 sine_generator_app 880 10
 ```
 
-### Testing the Loopback
+### Testing the Loopback (ALSA)
 
 In one terminal, run the sine wave generator:
 ```bash
-./build/sine_generator_app 440 10
+./build/linux/sine_generator_app 440 10
 ```
 
 In another terminal, run the test to verify:
 ```bash
-./build/test_loopback_read
+./build/linux/test_loopback_read
 ```
 
 The test will:
@@ -115,6 +139,15 @@ The test will:
 2. Analyze the signal amplitude
 3. Detect the frequency using zero-crossing detection
 4. Verify it matches the expected 440Hz tone
+
+### Testing with JACK2
+
+With JACK server running, simply run the sine generator:
+```bash
+./build/linux/jack_sine_generator 440 5
+```
+
+JACK will automatically route audio to your system's output. Use QjackCtl to visualize and manage connections.
 
 ### Verifying Installation
 
