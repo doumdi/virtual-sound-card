@@ -97,16 +97,20 @@ jobs:
     - name: Setup MSVC
       uses: microsoft/setup-msbuild@v2
       
-    - name: Install JACK2
-      run: |
-        # Download and install JACK2 for Windows
-        $jackUrl = "https://github.com/jackaudio/jack2-releases/releases/download/v1.9.21/jack2-win64-v1.9.21.exe"
-        $jackInstaller = "$env:TEMP\jack2-installer.exe"
-        Invoke-WebRequest -Uri $jackUrl -OutFile $jackInstaller
-        Start-Process -FilePath $jackInstaller -ArgumentList "/S" -Wait
-        echo "C:\Program Files\JACK2\include" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo "C:\Program Files\JACK2\lib" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+    - name: Install JACK2 (Windows)
       shell: pwsh
+      run: |
+        $jackUrl = "https://github.com/jackaudio/jack2-releases/releases/download/v1.9.21/jack2-win64-v1.9.21.zip"
+        $jackZip = "$env:TEMP\jack2.zip"
+        $jackDir = "C:\Program Files\JACK2"
+    
+        Invoke-WebRequest -Uri $jackUrl -OutFile $jackZip
+        Expand-Archive -Path $jackZip -DestinationPath $jackDir -Force
+    
+        echo "$jackDir\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "$jackDir\include" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "$jackDir\lib" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       
     - name: Configure CMake
       run: |
