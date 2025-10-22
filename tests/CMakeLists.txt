@@ -15,6 +15,13 @@ add_executable(test_sine_wave_file test_sine_wave_file.c)
 target_link_libraries(test_sine_wave_file vcard_common)
 add_test(NAME test_sine_wave_file COMMAND test_sine_wave_file)
 
+# Test for Windows WAVEFORMATEXTENSIBLE handling
+add_executable(test_windows_format_extensible test_windows_format_extensible.c)
+if(WIN32)
+    target_link_libraries(test_windows_format_extensible ole32 uuid)
+endif()
+add_test(NAME test_windows_format_extensible COMMAND test_windows_format_extensible)
+
 # Test for JACK2 availability (if JACK is found)
 find_package(PkgConfig)
 if(PkgConfig_FOUND)
